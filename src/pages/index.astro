@@ -1,0 +1,117 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getBlogPosts } from '../lib/blog';
+
+const recentPosts = await getBlogPosts();
+const latestPosts = recentPosts.slice(0, 3);
+---
+
+<Layout title="Inicio - Muga OS" description="Bienvenido a Muga OS">
+  <!-- Hero Section -->
+  <section class="px-6 py-20">
+    <div class="text-center">
+      <h1 class="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight">
+        MUGA OS
+      </h1>
+      <p class="text-lg text-neutral-300 max-w-2xl mx-auto mb-8 leading-relaxed">
+        Un espacio donde compartimos pensamientos, proyectos y experiencias.
+        Todo conectado directamente desde nuestro sistema y procesos.
+      </p>
+      <a 
+        href="/blog" 
+        class="inline-block bg-white text-black px-8 py-3 hover:bg-neutral-200 transition-colors font-medium text-sm uppercase tracking-wide"
+      >
+        Ver Blog
+      </a>
+    </div>
+  </section>
+
+  <!-- Recent Posts -->
+  {latestPosts.length > 0 ? (
+    <section class="px-6 py-16">
+      <h2 class="text-2xl font-bold text-white mb-12 uppercase tracking-wide">Últimas Publicaciones</h2>
+      <div class="space-y-8">
+        {latestPosts.map((post) => (
+          <article class="p-6 hover:bg-neutral-900 transition-colors">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div class="flex-1">
+                <h3 class="text-xl font-semibold text-white mb-2">
+                  <a href={`/blog/${post.slug}`} class="hover:text-neutral-300 transition-colors">
+                    {post.titulo}
+                  </a>
+                </h3>
+                {post.descripcion && (
+                  <p class="text-neutral-300 mb-4 leading-relaxed">
+                    {post.descripcion}
+                  </p>
+                )}
+                <div class="flex flex-wrap items-center gap-4 text-sm">
+                  {post.fecha && (
+                    <time class="text-neutral-500 uppercase tracking-wide text-xs">
+                      {new Date(post.fecha).toLocaleDateString('es-ES', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </time>
+                  )}
+                  {post.tags.length > 0 && (
+                    <div class="flex gap-2">
+                      {post.tags.slice(0, 2).map((tag) => (
+                        <span class="bg-neutral-800 text-neutral-300 px-2 py-1 text-xs uppercase tracking-wide">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div class="flex-shrink-0">
+                <a 
+                  href={`/blog/${post.slug}`}
+                  class="inline-flex items-center text-white hover:text-neutral-300 font-medium text-sm uppercase tracking-wide"
+                >
+                  Leer →
+                </a>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+      <div class="text-center mt-12">
+        <a 
+          href="/blog" 
+          class="text-neutral-400 hover:text-white font-medium text-sm uppercase tracking-wide"
+        >
+          Ver todas las publicaciones →
+        </a>
+      </div>
+    </section>
+  ) : (
+    <section class="px-6 py-16">
+      <div class="text-center">
+        <div class="diagonal-stripes bg-neutral-900/40 p-12 border border-neutral-800/60">
+          <h2 class="text-xl font-semibold text-neutral-300 mb-2 uppercase tracking-wide">
+            Sin Publicaciones
+          </h2>
+          <p class="text-neutral-500 text-sm">
+            Las publicaciones aparecerán aquí cuando las agregues a tu base de datos de Notion.
+          </p>
+        </div>
+      </div>
+    </section>
+  )}
+</Layout>
+
+<style>
+  .diagonal-stripes {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 1px,
+      rgba(115, 115, 115, 0.1) 3px,
+      rgba(115, 115, 115, 0.1) 10px
+    );
+  }
+</style>
+</Layout>

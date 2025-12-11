@@ -1,0 +1,138 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getBlogPosts, getBlogPost, getPageContent } from '../../lib/blog';
+
+export async function getStaticPaths() {
+  const posts = await getBlogPosts();
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { slug } = Astro.params;
+const { post } = Astro.props;
+
+const content = await getPageContent(post.id);
+---
+
+<Layout title={`${post.titulo} - Blog`} description={post.descripcion}>
+  <article class="max-w-3xl mx-auto">
+    <!-- Header del post -->
+    <header class="px-6 py-20">
+      <div class="mb-8">
+        <a 
+          href="/blog" 
+          class="inline-flex items-center text-neutral-400 hover:text-white text-sm font-medium uppercase tracking-wide"
+        >
+          ← Volver al blog
+        </a>
+      </div>
+      
+      <h1 class="text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">
+        {post.titulo}
+      </h1>
+      
+      {post.descripcion && (
+        <p class="text-xl text-neutral-300 mb-6 leading-relaxed">
+          {post.descripcion}
+        </p>
+      )}
+
+      <div class="flex flex-wrap items-center gap-4 text-sm">
+        {post.fecha && (
+          <time class="text-neutral-500 uppercase tracking-wide text-xs">
+            {new Date(post.fecha).toLocaleDateString('es-ES', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            })}
+          </time>
+        )}
+        
+        {post.tags.length > 0 && (
+          <div class="flex gap-2">
+            {post.tags.map((tag) => (
+              <span class="bg-neutral-800 text-neutral-300 px-2 py-1 text-xs uppercase tracking-wide">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </header>
+
+    <!-- Contenido del post -->
+    <div class="px-6 py-16">
+      {content ? (
+        <div class="prose prose-lg max-w-none border border-neutral-800/60 p-8">
+          <div class="whitespace-pre-wrap leading-relaxed text-neutral-300">
+            {content}
+          </div>
+        </div>
+      ) : (
+        <div class="diagonal-stripes bg-neutral-900/40 p-8 border border-neutral-800/60">
+          <div class="text-center">
+            <h3 class="font-semibold text-neutral-300 mb-2 uppercase tracking-wide">Contenido no disponible</h3>
+            <p class="text-neutral-500 text-sm">
+              El contenido de este post no se pudo cargar desde Notion. 
+              Verifica que la página tenga contenido y que los permisos estén configurados correctamente.
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+
+    <!-- Navegación -->
+    <footer class="px-6 py-12">
+      <div class="text-center">
+        <a 
+          href="/blog" 
+          class="inline-block bg-white text-black px-8 py-3 hover:bg-neutral-200 transition-colors font-medium text-sm uppercase tracking-wide"
+        >
+          Ver más posts
+        </a>
+      </div>
+    </footer>
+  </article>
+</Layout>
+
+<style>
+  .diagonal-stripes {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 1px,
+      rgba(115, 115, 115, 0.1) 3px,
+      rgba(115, 115, 115, 0.1) 10px
+    );
+  }
+
+  .prose {
+    @apply text-neutral-300 leading-relaxed;
+  }
+  
+  .prose h1 {
+    @apply text-2xl font-bold text-white mt-8 mb-4 uppercase tracking-wide;
+  }
+  
+  .prose h2 {
+    @apply text-xl font-bold text-white mt-6 mb-3 uppercase tracking-wide;
+  }
+  
+  .prose h3 {
+    @apply text-lg font-bold text-white mt-4 mb-2 uppercase tracking-wide;
+  }
+  
+  .prose p {
+    @apply mb-4 text-neutral-300;
+  }
+  
+  .prose ul, .prose ol {
+    @apply mb-4 pl-6 text-neutral-300;
+  }
+  
+  .prose li {
+    @apply mb-2;
+  }
+</style>
