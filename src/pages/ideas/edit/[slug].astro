@@ -1,0 +1,176 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { getIdeaBySlug } from '../../../lib/ideas';
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect('/ideas');
+}
+
+const idea = await getIdeaBySlug(slug);
+
+if (!idea) {
+  return Astro.redirect('/ideas');
+}
+---
+
+<Layout title={`Editar ${idea.data.title} - Muga OS`} description={`Editar idea: ${idea.data.title}`}>
+  <section class="px-6 py-16">
+    <div class="max-w-2xl mx-auto">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-white mb-2">Editar Idea</h1>
+        <p class="text-neutral-400">Modifica los detalles de tu idea</p>
+      </div>
+
+      <form
+        action={`/api/actualizar-idea?slug=${slug}`}
+        method="POST"
+        class="space-y-6"
+      >
+        <div>
+          <label for="title" class="block text-sm font-medium text-neutral-300 mb-2">
+            Título *
+          </label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            required
+            value={idea.data.title}
+            class="w-full bg-neutral-900 border border-neutral-700 text-white px-4 py-3 focus:outline-none focus:border-white transition-colors"
+          />
+        </div>
+
+        <div>
+          <label for="description" class="block text-sm font-medium text-neutral-300 mb-2">
+            Descripción
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            rows="4"
+            class="w-full bg-neutral-900 border border-neutral-700 text-white px-4 py-3 focus:outline-none focus:border-white transition-colors resize-vertical"
+          >{idea.data.description || ''}</textarea>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label for="status" class="block text-sm font-medium text-neutral-300 mb-2">
+              Estado
+            </label>
+            <select
+              id="status"
+              name="status"
+              class="w-full bg-neutral-900 border border-neutral-700 text-white px-4 py-3 focus:outline-none focus:border-white transition-colors"
+            >
+              <option value="Idea" selected={idea.data.status === 'Idea'}>Idea</option>
+              <option value="Planificación" selected={idea.data.status === 'Planificación'}>Planificación</option>
+              <option value="En desarrollo" selected={idea.data.status === 'En desarrollo'}>En desarrollo</option>
+              <option value="Completado" selected={idea.data.status === 'Completado'}>Completado</option>
+              <option value="Archivado" selected={idea.data.status === 'Archivado'}>Archivado</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="priority" class="block text-sm font-medium text-neutral-300 mb-2">
+              Prioridad
+            </label>
+            <select
+              id="priority"
+              name="priority"
+              class="w-full bg-neutral-900 border border-neutral-700 text-white px-4 py-3 focus:outline-none focus:border-white transition-colors"
+            >
+              <option value="Baja" selected={idea.data.priority === 'Baja'}>Baja</option>
+              <option value="Media" selected={idea.data.priority === 'Media'}>Media</option>
+              <option value="Alta" selected={idea.data.priority === 'Alta'}>Alta</option>
+              <option value="Urgente" selected={idea.data.priority === 'Urgente'}>Urgente</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label for="area" class="block text-sm font-medium text-neutral-300 mb-2">
+              Área
+            </label>
+            <select
+              id="area"
+              name="area"
+              class="w-full bg-neutral-900 border border-neutral-700 text-white px-4 py-3 focus:outline-none focus:border-white transition-colors"
+            >
+              <option value="" selected={!idea.data.area}>Seleccionar área</option>
+              <option value="Studio" selected={idea.data.area === 'Studio'}>Studio</option>
+              <option value="Dev" selected={idea.data.area === 'Dev'}>Dev</option>
+              <option value="Mixto" selected={idea.data.area === 'Mixto'}>Mixto</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="progress" class="block text-sm font-medium text-neutral-300 mb-2">
+              Progreso (%)
+            </label>
+            <input
+              type="number"
+              id="progress"
+              name="progress"
+              min="0"
+              max="100"
+              value={idea.data.progress}
+              class="w-full bg-neutral-900 border border-neutral-700 text-white px-4 py-3 focus:outline-none focus:border-white transition-colors"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label for="tags" class="block text-sm font-medium text-neutral-300 mb-2">
+            Tags (separados por comas)
+          </label>
+          <input
+            type="text"
+            id="tags"
+            name="tags"
+            value={idea.data.tags.join(', ')}
+            class="w-full bg-neutral-900 border border-neutral-700 text-white px-4 py-3 focus:outline-none focus:border-white transition-colors"
+          />
+        </div>
+
+        <div>
+          <label for="notes" class="block text-sm font-medium text-neutral-300 mb-2">
+            Notas adicionales
+          </label>
+          <textarea
+            id="notes"
+            name="notes"
+            rows="3"
+            class="w-full bg-neutral-900 border border-neutral-700 text-white px-4 py-3 focus:outline-none focus:border-white transition-colors resize-vertical"
+          >{idea.data.notes || ''}</textarea>
+        </div>
+
+        <div class="flex gap-4 pt-6">
+          <button
+            type="submit"
+            class="bg-white text-black px-8 py-3 hover:bg-neutral-200 transition-colors font-medium text-sm uppercase tracking-wide"
+          >
+            Actualizar Idea
+          </button>
+          <a
+            href="/ideas"
+            class="border border-neutral-700 text-neutral-300 px-8 py-3 hover:bg-neutral-800 transition-colors font-medium text-sm uppercase tracking-wide"
+          >
+            Cancelar
+          </a>
+          <button
+            type="button"
+            onclick={`if(confirm('¿Estás seguro de que quieres eliminar esta idea?')) { window.location.href = '/api/eliminar-idea?slug=${slug}'; }`}
+            class="border border-red-700 text-red-400 px-8 py-3 hover:bg-red-900/20 transition-colors font-medium text-sm uppercase tracking-wide"
+          >
+            Eliminar
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+</Layout>

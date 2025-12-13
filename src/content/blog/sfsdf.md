@@ -4,6 +4,7 @@ area: "Studio"
 status: "Publicado"
 date: "2025-12-12"
 tags: ["Blender","materiales"]
+image: "/images/sfsdf-featured.png"
 ---
 
 <img src="/images/sfsdf-featured.png" alt="Imagen destacada" class="w-full h-64 object-cover mb-8 border border-neutral-700">

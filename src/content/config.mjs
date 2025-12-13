@@ -9,6 +9,7 @@ const blogCollection = defineCollection({
     status: z.enum(['Borrador', 'Publicado', 'Archivado']).default('Borrador'),
     date: z.string().transform((str) => new Date(str)),
     tags: z.array(z.string()).default([]),
+    image: z.string().optional(),
     relatedProject: z.string().optional(),
     resources: z.array(z.string()).default([]),
     idea: z.string().optional(),
@@ -41,20 +42,25 @@ const articlesCollection = defineCollection({
   }),
 });
 
-const resourcesCollection = defineCollection({
+const ideasCollection = defineCollection({
   type: 'content',
   schema: z.object({
-    name: z.string(),
-    type: z.enum(['código', 'material', 'referencia', 'template']).optional(),
+    title: z.string(),
     description: z.string().optional(),
-    file: z.string().optional(),
+    status: z.enum(['Idea', 'Planificación', 'En desarrollo', 'Completado', 'Archivado']).default('Idea'),
+    progress: z.number().min(0).max(100).default(0),
+    priority: z.enum(['Baja', 'Media', 'Alta', 'Urgente']).default('Media'),
+    area: z.enum(['Studio', 'Dev', 'Mixto']).optional(),
     tags: z.array(z.string()).default([]),
+    notes: z.string().optional(),
+    date: z.string().transform((str) => new Date(str)),
   }),
 });
+
 
 export const collections = {
   blog: blogCollection,
   projects: projectsCollection,
   articles: articlesCollection,
-  resources: resourcesCollection,
+  ideas: ideasCollection,
 };"" 

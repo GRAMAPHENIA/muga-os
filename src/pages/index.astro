@@ -27,31 +27,32 @@ const secondaryPosts = recentPosts.slice(1, 3);
     </div>
   </section>
 
-  <!-- Featured Post -->
+  <!-- Featured Post - Newspaper Style -->
   {featuredPost ? (
-    <section class="px-6 py-16">
-      <div class="max-w-4xl mx-auto">
-        <article class="bg-neutral-900/50 border border-neutral-800 overflow-hidden hover:bg-neutral-900/70 transition-colors">
-          <div class="md:flex">
-            <div class="md:w-1/2 p-8">
-              <div class="flex items-center gap-2 mb-4">
-                <span class="bg-white text-black px-3 py-1 text-xs font-bold uppercase tracking-wide">
-                  Última Publicación
+    <section class="px-6 py-24">
+      <div class="max-w-7xl mx-auto">
+        <article class="bg-neutral-900/60 border border-neutral-700/50 overflow-hidden">
+          <div class="grid lg:grid-cols-3 gap-0 min-h-[700px]">
+            <!-- Main Content -->
+            <div class="lg:col-span-2 p-16 lg:p-20 flex flex-col justify-center">
+              <div class="flex flex-col items-left align items-start  gap-4 mb-8">
+                <span class="bg-red-500/20 text-white px-4 py-2 text-sm font-bold uppercase tracking-wider">
+                  Portada
                 </span>
                 {featuredPost.data.area && (
-                  <span class="bg-neutral-800 text-neutral-300 px-3 py-1 text-xs uppercase tracking-wide">
-                    {featuredPost.data.area}
+                  <span class="bg-neutral-800/80 text-neutral-300 px-2 py-1 text-xs tracking-wide">
+                    {featuredPost.data.area.toLowerCase()}
                   </span>
                 )}
               </div>
-              <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight">
-                <a href={`/blog/${featuredPost.slug}`} class="hover:text-neutral-300 transition-colors">
+              <h2 class="text-5xl lg:text-8xl font-black text-white mb-10 leading-tight tracking-tight">
+                <a href={`/blog/${featuredPost.slug}`} class="hover:text-neutral-300 transition-colors uppercase">
                   {featuredPost.data.title}
                 </a>
               </h2>
-              <div class="flex flex-wrap items-center gap-4 text-sm mb-6">
+              <div class="flex flex-wrap items-center gap-6 text-base mb-12">
                 {featuredPost.data.date && !isNaN(featuredPost.data.date.getTime()) && (
-                  <time class="text-neutral-400 uppercase tracking-wide text-xs">
+                  <time class="text-neutral-400 uppercase tracking-wider font-medium">
                     {featuredPost.data.date.toLocaleDateString('es-ES', {
                       year: 'numeric',
                       month: 'long',
@@ -60,9 +61,9 @@ const secondaryPosts = recentPosts.slice(1, 3);
                   </time>
                 )}
                 {featuredPost.data.tags.length > 0 && (
-                  <div class="flex gap-2">
-                    {featuredPost.data.tags.slice(0, 3).map((tag) => (
-                      <span class="bg-neutral-800 text-neutral-300 px-2 py-1 text-xs uppercase tracking-wide">
+                  <div class="flex gap-3">
+                    {featuredPost.data.tags.slice(0, 2).map((tag) => (
+                      <span class="bg-neutral-800/60 text-neutral-300 px-2 py-1 text-xs tracking-wide">
                         {tag}
                       </span>
                     ))}
@@ -71,18 +72,27 @@ const secondaryPosts = recentPosts.slice(1, 3);
               </div>
               <a
                 href={`/blog/${featuredPost.slug}`}
-                class="inline-flex items-center bg-white text-black px-6 py-3 hover:bg-neutral-200 transition-colors font-medium text-sm uppercase tracking-wide"
+                class="inline-flex items-center bg-white text-black px-8 py-4 hover:bg-neutral-200 transition-colors font-bold text-lg uppercase tracking-wider self-start"
               >
                 Leer Publicación Completa →
               </a>
             </div>
-            <div class="md:w-1/2 bg-neutral-800/30 flex items-center justify-center p-8">
-              <div class="text-center">
-                <svg class="w-16 h-16 text-neutral-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-                <p class="text-neutral-500 text-xs uppercase tracking-wide">Imagen Destacada</p>
-              </div>
+            <!-- Featured Image -->
+            <div class="lg:col-span-1 bg-neutral-800/30 flex items-center justify-center overflow-hidden">
+              {featuredPost.data.image ? (
+                <img
+                  src={featuredPost.data.image}
+                  alt={featuredPost.data.title}
+                  class="w-full h-full object-cover"
+                />
+              ) : (
+                <div class="text-center">
+                  <svg class="w-32 h-32 text-neutral-500 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                  <p class="text-neutral-500 text-sm uppercase tracking-wide font-medium">Imagen Destacada</p>
+                </div>
+              )}
             </div>
           </div>
         </article>
@@ -90,63 +100,59 @@ const secondaryPosts = recentPosts.slice(1, 3);
     </section>
   ) : null}
 
-  <!-- Secondary Posts -->
+  <!-- Secondary Posts - Simplified -->
   {secondaryPosts && secondaryPosts.length > 0 ? (
-    <section class="px-6 py-16 bg-neutral-950/50">
-      <div class="max-w-6xl mx-auto">
-        <h2 class="text-2xl font-bold text-white mb-8 uppercase tracking-wide text-center">Más Publicaciones</h2>
-        <div class="grid md:grid-cols-2 gap-6">
+    <section class="px-6 py-20">
+      <div class="max-w-5xl mx-auto">
+        <div class="space-y-8">
           {secondaryPosts.map((post) => (
-            <article class="bg-neutral-900/40 border border-neutral-800/50 p-6 hover:bg-neutral-900/60 transition-colors">
-              <div class="flex items-start justify-between mb-4">
-                <div class="flex items-center gap-2">
-                  {post.data.area && (
-                    <span class="bg-neutral-800 text-neutral-300 px-2 py-1 text-xs uppercase tracking-wide">
-                      {post.data.area}
-                    </span>
-                  )}
-                  {post.data.category && post.data.category.length > 0 && (
-                    <span class="bg-neutral-700 text-neutral-400 px-2 py-1 text-xs uppercase tracking-wide">
-                      {post.data.category[0]}
-                    </span>
-                  )}
+            <article class="border-b border-neutral-800 pb-8 last:border-b-0">
+              <div class="flex items-start justify-between gap-6">
+                <div class="flex-1">
+                  <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-3">
+                      {post.data.area && (
+                        <span class="bg-neutral-800 text-neutral-400 px-3 py-1 text-xs uppercase tracking-wide">
+                          {post.data.area}
+                        </span>
+                      )}
+                      {post.data.date && !isNaN(post.data.date.getTime()) && (
+                        <time class="text-neutral-500 uppercase tracking-wide text-xs">
+                          {post.data.date.toLocaleDateString('es-ES', {
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </time>
+                      )}
+                    </div>
+                  </div>
+                  <h3 class="text-2xl font-bold text-white mb-3">
+                    <a href={`/blog/${post.slug}`} class="hover:text-neutral-300 transition-colors">
+                      {post.data.title}
+                    </a>
+                  </h3>
+                  <a
+                    href={`/blog/${post.slug}`}
+                    class="inline-flex items-center text-neutral-400 hover:text-white font-medium text-sm uppercase tracking-wide"
+                  >
+                    Leer →
+                  </a>
                 </div>
-                {post.data.date && !isNaN(post.data.date.getTime()) && (
-                  <time class="text-neutral-500 uppercase tracking-wide text-xs">
-                    {post.data.date.toLocaleDateString('es-ES', {
-                      month: 'short',
-                      day: 'numeric'
-                    })}
-                  </time>
-                )}
+                <div class="flex-shrink-0">
+                  <div class="w-20 h-20 bg-neutral-800/50 flex items-center justify-center">
+                    <svg class="w-8 h-8 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                  </div>
+                </div>
               </div>
-              <h3 class="text-xl font-semibold text-white mb-3">
-                <a href={`/blog/${post.slug}`} class="hover:text-neutral-300 transition-colors">
-                  {post.data.title}
-                </a>
-              </h3>
-              {post.data.tags.length > 0 && (
-                <div class="flex gap-2 mb-4">
-                  {post.data.tags.slice(0, 2).map((tag) => (
-                    <span class="bg-neutral-800/50 text-neutral-400 px-2 py-1 text-xs uppercase tracking-wide">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-              <a
-                href={`/blog/${post.slug}`}
-                class="inline-flex items-center text-neutral-300 hover:text-white font-medium text-sm uppercase tracking-wide"
-              >
-                Leer →
-              </a>
             </article>
           ))}
         </div>
-        <div class="text-center mt-12">
+        <div class="text-center mt-16">
           <a
             href="/blog"
-            class="inline-block bg-neutral-800 text-white px-8 py-3 hover:bg-neutral-700 transition-colors font-medium text-sm uppercase tracking-wide border border-neutral-700"
+            class="inline-block text-neutral-400 hover:text-white transition-colors font-medium text-sm uppercase tracking-wide"
           >
             Ver todas las publicaciones →
           </a>
