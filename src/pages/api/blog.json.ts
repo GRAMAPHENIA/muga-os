@@ -2,6 +2,8 @@
 
 import { getBlogPosts } from "../../lib/blog";
 
+export const prerender = false;
+
 export async function GET() {
   try {
     const posts = await getBlogPosts();
