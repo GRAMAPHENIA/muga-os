@@ -2,6 +2,8 @@
 
 import { getBlogPost, getPageContent } from "../../../lib/blog";
 
+export const prerender = false;
+
 export async function GET({ params }: { params: { slug: string } }) {
   try {
     const { slug } = params;

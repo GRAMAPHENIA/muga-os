@@ -49,6 +49,10 @@ Un sitio web moderno construido con Astro que utiliza colecciones de contenido l
 
 ## 🚀 Configuración Inicial
 
+### 0. Versión de Node
+
+Usa **Node 20** (la versión soportada por Vercel Functions). Puedes fijarla con `nvm use` gracias al archivo `.nvmrc` incluido.
+
 ### 1. Instalar dependencias
 
 ```bash
