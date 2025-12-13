@@ -1,13 +1,14 @@
 ---
 // src/layouts/Layout.astro
 import Logo from '../components/Logo.astro';
+import { Home, BookOpenText, Bug } from 'lucide-static';
 
 export interface Props {
   title: string;
   description?: string;
 }
 
-const { title, description = "Sitio web de Muga OS con Astro y Notion" } = Astro.props;
+const { title, description = "Sitio web de Muga OS con Astro y contenido local" } = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -27,14 +28,17 @@ const { title, description = "Sitio web de Muga OS con Astro y Notion" } = Astro
             <Logo />
           </a>
           <div class="flex items-center space-x-8">
-            <a href="/" class="text-neutral-400 hover:text-white transition-colors text-sm uppercase tracking-wide">
-              Inicio
+            <a href="/" class="text-neutral-400 hover:text-white transition-colors text-sm uppercase tracking-wide flex items-center gap-3">
+              <span set:html={Home.replace('<svg', '<svg class="w-5 h-5"')} class="inline-block"></span>
+              <span class="sr-only">Inicio</span>
             </a>
-            <a href="/blog" class="text-neutral-400 hover:text-white transition-colors text-sm uppercase tracking-wide">
-              Blog
+            <a href="/blog" class="text-neutral-400 hover:text-white transition-colors text-sm uppercase tracking-wide flex items-center gap-3">
+              <span set:html={BookOpenText.replace('<svg', '<svg class="w-5 h-5"')} class="inline-block"></span>
+              <span class="sr-only">Blog</span>
             </a>
-            <a href="/notion-debug" class="text-neutral-600 hover:text-neutral-400 transition-colors text-xs uppercase tracking-wide">
-              Debug
+            <a href="/debug" class="text-red-500 hover:text-red-400 transition-colors text-xs uppercase tracking-wide flex items-center gap-3">
+              <span set:html={Bug.replace('<svg', '<svg class="w-4.5 h-4.5"')} class="inline-block"></span>
+              <span class="sr-only">Debug</span>
             </a>
           </div>
         </div>
@@ -48,10 +52,10 @@ const { title, description = "Sitio web de Muga OS con Astro y Notion" } = Astro
     <footer class="bg-neutral-950 mt-16">
       <div class="max-w-4xl mx-auto px-6 py-8 text-center">
         <p class="text-neutral-600 text-xs uppercase tracking-wide mb-2">
-          2025 MUGA OS. Hecho con Astro y Notion.
+          2025 MUGA OS. Hecho con Astro y contenido local.
         </p>
         <p class="text-neutral-700 text-xs">
-          v0.0.1
+          v1.0.0
         </p>
       </div>
     </footer>

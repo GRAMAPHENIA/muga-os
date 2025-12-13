@@ -1,0 +1,99 @@
+---
+export async function getStaticPaths() {
+  const { getCollection } = await import('astro:content');
+  const articles = await getCollection('articles');
+  return articles.map((article) => ({
+    params: { slug: article.slug },
+    props: { article },
+  }));
+}
+
+const { article } = Astro.props;
+const { Content } = await article.render();
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{article.data.title} - Muga OS</title>
+    <meta name="description" content={article.data.title} />
+  </head>
+  <body class="bg-black text-white min-h-screen">
+    <article class="max-w-3xl mx-auto px-6 py-20">
+      <!-- Header -->
+      <header class="mb-12">
+        <div class="mb-8">
+          <a
+            href="/articles"
+            class="inline-flex items-center text-neutral-400 hover:text-white text-sm font-medium uppercase tracking-wide"
+          >
+            ← Volver a artículos
+          </a>
+        </div>
+
+        <h1 class="text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">
+          {article.data.title}
+        </h1>
+
+        <div class="flex flex-wrap items-center gap-4 text-sm">
+          {article.data.category && (
+            <span class="bg-neutral-800 text-neutral-300 px-2 py-1 text-xs uppercase tracking-wide">
+              {article.data.category}
+            </span>
+          )}
+          <span class="bg-neutral-800 text-neutral-300 px-2 py-1 text-xs uppercase tracking-wide">
+            {article.data.status}
+          </span>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="prose prose-lg max-w-none">
+        <Content />
+      </div>
+
+      <!-- Navigation -->
+      <footer class="mt-12 pt-8 border-t border-neutral-800">
+        <div class="text-center">
+          <a
+            href="/articles"
+            class="inline-block bg-white text-black px-8 py-3 hover:bg-neutral-200 transition-colors font-medium text-sm uppercase tracking-wide"
+          >
+            Ver más artículos
+          </a>
+        </div>
+      </footer>
+    </article>
+  </body>
+</html>
+
+<style>
+  .prose {
+    @apply text-neutral-300 leading-relaxed;
+  }
+
+  .prose h1 {
+    @apply text-2xl font-bold text-white mt-8 mb-4 uppercase tracking-wide;
+  }
+
+  .prose h2 {
+    @apply text-xl font-bold text-white mt-6 mb-3 uppercase tracking-wide;
+  }
+
+  .prose h3 {
+    @apply text-lg font-bold text-white mt-4 mb-2 uppercase tracking-wide;
+  }
+
+  .prose p {
+    @apply mb-4 text-neutral-300;
+  }
+
+  .prose ul, .prose ol {
+    @apply mb-4 pl-6 text-neutral-300;
+  }
+
+  .prose li {
+    @apply mb-2;
+  }
+</style>

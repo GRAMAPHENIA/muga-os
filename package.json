@@ -1,7 +1,7 @@
 {
   "name": "muga-os-site",
   "type": "module",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -9,9 +9,12 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@notionhq/client": "^2.2.15",
+    "@astrojs/check": "^0.9.6",
     "astro": "^5.16.5",
-    "lucide-react": "^0.560.0"
+    "csv-parse": "^6.1.0",
+    "lucide": "^0.561.0",
+    "lucide-react": "^0.560.0",
+    "lucide-static": "^0.561.0"
   },
   "devDependencies": {
     "@astrojs/tailwind": "^6.0.2",

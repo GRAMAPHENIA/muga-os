@@ -1,0 +1,218 @@
+a UI---
+import Layout from '../../layouts/Layout.astro';
+
+const areas = ['Studio', 'Dev'];
+const categorias = ['Astro', 'React', 'Blender', 'Tutorial', 'Proyecto', 'Reflexión'];
+const estados = ['Borrador', 'Publicado', 'Archivado'];
+---
+
+<Layout title="Nuevo Post - Blog" description="Crear un nuevo post para el blog">
+  <!-- Header -->
+  <section class="px-6 py-20">
+    <div class="text-center">
+      <h1 class="text-3xl md:text-4xl font-bold text-white mb-6 uppercase tracking-wide">
+        Nuevo Post
+      </h1>
+      <p class="text-lg text-neutral-300 max-w-2xl mx-auto leading-relaxed">
+        Crea un nuevo post para el blog. Completa el formulario y copia el contenido generado.
+      </p>
+    </div>
+  </section>
+
+  <!-- Form -->
+  <section class="px-6 py-16">
+    <div class="max-w-2xl mx-auto">
+      <form id="postForm" action="/api/create-post" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <div>
+          <label for="titulo" class="block text-sm font-medium text-neutral-300 mb-2">
+            Título *
+          </label>
+          <input
+            type="text"
+            id="titulo"
+            name="titulo"
+            required
+            class="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 focus:border-white focus:outline-none"
+            placeholder="Ingresa el título del post"
+          />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="area" class="block text-sm font-medium text-neutral-300 mb-2">
+              Área
+            </label>
+            <select
+              id="area"
+              name="area"
+              class="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 text-white focus:border-white focus:outline-none"
+            >
+              <option value="">Seleccionar área</option>
+              {areas.map(area => (
+                <option value={area}>{area}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label for="estado" class="block text-sm font-medium text-neutral-300 mb-2">
+              Estado *
+            </label>
+            <select
+              id="estado"
+              name="estado"
+              required
+              class="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 text-white focus:border-white focus:outline-none"
+            >
+              {estados.map(estado => (
+                <option value={estado}>{estado}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="categoria" class="block text-sm font-medium text-neutral-300 mb-2">
+            Categoría
+          </label>
+          <select
+            id="categoria"
+            name="categoria"
+            class="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 text-white focus:border-white focus:outline-none"
+          >
+            <option value="">Seleccionar categoría</option>
+            {categorias.map(cat => (
+              <option value={cat}>{cat}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label for="fecha" class="block text-sm font-medium text-neutral-300 mb-2">
+            Fecha *
+          </label>
+          <input
+            type="date"
+            id="fecha"
+            name="fecha"
+            required
+            class="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 text-white focus:border-white focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label for="tags" class="block text-sm font-medium text-neutral-300 mb-2">
+            Tags (separados por coma)
+          </label>
+          <input
+            type="text"
+            id="tags"
+            name="tags"
+            class="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 focus:border-white focus:outline-none"
+            placeholder="tag1, tag2, tag3"
+          />
+        </div>
+
+        <div>
+          <label for="descripcion" class="block text-sm font-medium text-neutral-300 mb-2">
+            Descripción
+          </label>
+          <textarea
+            id="descripcion"
+            name="descripcion"
+            rows="3"
+            class="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 focus:border-white focus:outline-none"
+            placeholder="Breve descripción del post"
+          ></textarea>
+        </div>
+
+        <div>
+          <label for="introduccion" class="block text-sm font-medium text-neutral-300 mb-2">
+            Introducción
+          </label>
+          <textarea
+            id="introduccion"
+            name="introduccion"
+            rows="3"
+            class="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 focus:border-white focus:outline-none"
+            placeholder="Escribe una introducción atractiva para tu post..."
+          ></textarea>
+        </div>
+
+        <div>
+          <label for="contenido" class="block text-sm font-medium text-neutral-300 mb-2">
+            Contenido Principal
+          </label>
+          <textarea
+            id="contenido"
+            name="contenido"
+            rows="8"
+            class="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 focus:border-white focus:outline-none"
+            placeholder="Escribe el contenido principal de tu post aquí. Puedes usar párrafos normales - no necesitas conocer Markdown.
+
+El sistema convertirá automáticamente tu texto a formato web profesional."
+          ></textarea>
+        </div>
+
+        <div>
+          <label for="conclusion" class="block text-sm font-medium text-neutral-300 mb-2">
+            Conclusión
+          </label>
+          <textarea
+            id="conclusion"
+            name="conclusion"
+            rows="3"
+            class="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-500 focus:border-white focus:outline-none"
+            placeholder="Resume los puntos clave y finaliza con una reflexión..."
+          ></textarea>
+        </div>
+
+        <div>
+          <label for="imagen_destacada" class="block text-sm font-medium text-neutral-300 mb-2">
+            Imagen Destacada
+          </label>
+          <input
+            type="file"
+            id="imagen_destacada"
+            name="imagen_destacada"
+            accept="image/*"
+            class="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 text-white file:bg-neutral-800 file:border-0 file:px-4 file:py-2 file:text-white file:mr-4 focus:border-white focus:outline-none"
+          />
+          <p class="text-xs text-neutral-500 mt-1">
+            Sube una imagen desde tu ordenador para encabezar el post (opcional)
+          </p>
+        </div>
+
+        <div class="flex gap-4">
+          <button
+            type="submit"
+            onclick="console.log('Form submitted'); const formData = new FormData(document.getElementById('postForm')); console.log('Form data:', Object.fromEntries(formData)); console.log('Image file:', formData.get('imagen_destacada'));"
+            class="flex-1 bg-white text-black px-8 py-3 hover:bg-neutral-200 transition-colors font-medium text-sm uppercase tracking-wide"
+          >
+            Crear Post
+          </button>
+          <a
+            href="/blog"
+            class="flex-1 text-center bg-neutral-800 text-white px-8 py-3 hover:bg-neutral-700 transition-colors font-medium text-sm uppercase tracking-wide"
+          >
+            Cancelar
+          </a>
+        </div>
+      </form>
+
+    </div>
+  </section>
+</Layout>
+
+
+<style>
+  .diagonal-stripes {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 1px,
+      rgba(115, 115, 115, 0.1) 3px,
+      rgba(115, 115, 115, 0.1) 10px
+    );
+  }
+</style>

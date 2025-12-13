@@ -1,0 +1,21 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#f8f9fa"/>
+  <rect x="20" y="20" width="360" height="260" fill="#ffffff" stroke="#dee2e6" stroke-width="2" rx="8"/>
+  <text x="200" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#495057" font-weight="bold">
+    Configuración del Shader Emission
+  </text>
+  <circle cx="100" cy="120" r="30" fill="#ffc107" opacity="0.7"/>
+  <text x="100" y="127" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#495057">
+    Luz
+  </text>
+  <rect x="160" y="100" width="80" height="40" fill="#e9ecef" stroke="#adb5bd" stroke-width="1"/>
+  <text x="200" y="122" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#6c757d">
+    Material
+  </text>
+  <text x="200" y="240" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#6c757d">
+    Placeholder - Imagen no disponible
+  </text>
+  <text x="200" y="260" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#adb5bd">
+    Reemplaza con imagen real del tutorial
+  </text>
+</svg>
