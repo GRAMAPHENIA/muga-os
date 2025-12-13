@@ -2,7 +2,32 @@
 import Layout from '../layouts/Layout.astro';
 import { getIdeas } from '../lib/ideas';
 
+export const prerender = false;
+
 const ideas = await getIdeas();
+const url = new URL(Astro.request.url);
+const success = url.searchParams.get('success');
+const error = url.searchParams.get('error');
+
+const messages = {
+  success: {
+    created: 'La idea se creó correctamente en el entorno actual.'
+  },
+  error: {
+    'write-protected': 'No se pudo crear la idea en producción porque el filesystem de Vercel es de solo lectura. Crea el contenido en desarrollo o mediante preview, y súbelo al repositorio.',
+    'no-storage': 'No se pudo crear la idea en producción porque falta la configuración de Vercel Blob (BLOB_READ_WRITE_TOKEN). Añade la variable de entorno para habilitar el guardado.',
+    'storage-failed': 'No se pudo crear la idea en producción porque la subida a Vercel Blob falló. Revisa la variable BLOB_READ_WRITE_TOKEN y vuelve a intentarlo.',
+    unexpected: 'No se pudo crear la idea. Inténtalo de nuevo o revisa los logs del servidor.'
+  }
+};
+
+const successMessage = success && success in messages.success
+  ? messages.success[success as keyof typeof messages.success]
+  : null;
+
+const errorMessage = error && error in messages.error
+  ? messages.error[error as keyof typeof messages.error]
+  : null;
 ---
 
 <Layout title="Ideas - Muga OS" description="Gestión de ideas y proyectos en Muga OS">
@@ -14,6 +39,16 @@ const ideas = await getIdeas();
       <p class="text-lg text-neutral-300 max-w-2xl mx-auto mb-8 leading-relaxed">
         Gestión y seguimiento de ideas y proyectos
       </p>
+      {successMessage && (
+        <div class="max-w-2xl mx-auto mb-8 bg-emerald-900/30 border border-emerald-700 text-emerald-200 px-6 py-4 text-sm leading-relaxed">
+          {successMessage}
+        </div>
+      )}
+      {errorMessage && (
+        <div class="max-w-2xl mx-auto mb-8 bg-amber-900/30 border border-amber-700 text-amber-100 px-6 py-4 text-sm leading-relaxed">
+          {errorMessage}
+        </div>
+      )}
       <a
         href="/ideas/new"
         class="inline-block bg-white text-black px-8 py-3 hover:bg-neutral-200 transition-colors font-medium text-sm uppercase tracking-wide"

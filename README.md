@@ -49,6 +49,10 @@ Un sitio web moderno construido con Astro que utiliza colecciones de contenido l
 
 ## 🚀 Configuración Inicial
 
+### 0. Versión de Node
+
+Usa **Node 20** (la versión soportada por Vercel Functions). Puedes fijarla con `nvm use` gracias al archivo `.nvmrc` incluido.
+
 ### 1. Instalar dependencias
 
 ```bash
@@ -75,7 +79,7 @@ Puedes crear posts de dos formas:
 
 ### 4. Variables de entorno
 
-No se requieren variables de entorno externas. El sitio es completamente autónomo.
+- `BLOB_READ_WRITE_TOKEN` (opcional en local, obligatorio en Vercel si quieres crear ideas desde producción): token generado en **Storage > Blob** para subir/leer los markdown de ideas en tiempo de ejecución. Si falta, las nuevas ideas en producción mostrarán un error y no se guardarán.
 
 ## 🧞 Comandos
 

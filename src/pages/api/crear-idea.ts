@@ -5,6 +5,16 @@ export const prerender = false;
 
 export async function POST({ request }) {
   try {
+    const redirectWithMessage = (searchParams: Record<string, string>) =>
+      new Response(null, {
+        status: 303,
+        headers: {
+          Location: `/ideas?${new URLSearchParams(searchParams).toString()}`
+        }
+      });
+
+    const isVercelProd = process.env.VERCEL === '1' && process.env.VERCEL_ENV === 'production';
+
     const contentType = request.headers.get('content-type') || '';
     let formData: FormData;
 
@@ -59,26 +69,43 @@ date: "${new Date().toISOString().split('T')[0]}"
 ${description || ''}
 `;
 
-    // Ensure directory exists
-    const ideasDir = join(process.cwd(), 'src', 'content', 'ideas');
-    mkdirSync(ideasDir, { recursive: true });
-
-    // Write file
-    const filePath = join(ideasDir, `${slug}.md`);
-    writeFileSync(filePath, frontmatter, 'utf8');
-
-    return new Response(null, {
-      status: 302,
-      headers: {
-        'Location': '/ideas?success=created'
+    if (isVercelProd) {
+      if (!process.env.BLOB_READ_WRITE_TOKEN) {
+        console.warn('Crear idea bloqueado en producción: falta BLOB_READ_WRITE_TOKEN');
+        return redirectWithMessage({ error: 'no-storage' });
       }
-    });
+
+      const upload = await fetch(`https://blob.vercel-storage.com/ideas/${slug}.md`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
+        },
+        body: frontmatter,
+      });
+
+      if (!upload.ok) {
+        console.error('Fallo al guardar en Vercel Blob', await upload.text());
+        return redirectWithMessage({ error: 'storage-failed' });
+      }
+    } else {
+      // Ensure directory exists
+      const ideasDir = join(process.cwd(), 'src', 'content', 'ideas');
+      mkdirSync(ideasDir, { recursive: true });
+
+      // Write file
+      const filePath = join(ideasDir, `${slug}.md`);
+      writeFileSync(filePath, frontmatter, 'utf8');
+    }
+
+    return redirectWithMessage({ success: 'created' });
 
   } catch (error) {
     console.error('Error creating idea:', error);
-    return new Response(JSON.stringify({ error: 'Error interno del servidor' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
+    return new Response(null, {
+      status: 303,
+      headers: {
+        Location: '/ideas?error=unexpected'
+      }
     });
   }
 }
