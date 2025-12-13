@@ -57,10 +57,22 @@ const ideasCollection = defineCollection({
   }),
 });
 
+const resourcesCollection = defineCollection({
+  type: 'content',
+  schema: z.object({
+    name: z.string(),
+    type: z.string().optional(),
+    description: z.string().optional(),
+    url: z.string().url().optional(),
+    tags: z.array(z.string()).default([]),
+  }),
+});
+
 
 export const collections = {
   blog: blogCollection,
   projects: projectsCollection,
   articles: articlesCollection,
   ideas: ideasCollection,
-};"" 
+  resources: resourcesCollection,
+};
