@@ -29,6 +29,13 @@ const bulletClass =
       as="h3"
       variant="subheading"
       class="mb-4 uppercase tracking-[0.12em] text-[11px] text-neutral-500"
+---
+{headings.length > 0 && (
+  <aside class="hidden lg:block w-[240px] sticky top-8 self-start">
+    <Typography
+      as="h3"
+      variant="subheading"
+      class="mb-3 uppercase tracking-[0.12em] text-xs text-neutral-500"
     >
       En esta página
     </Typography>
@@ -39,12 +46,26 @@ const bulletClass =
           <li class={`relative ${heading.level === 3 ? "pl-7" : "pl-4"} leading-6`}>
             <a
               class={`${linkBaseClass} ${levelClass[heading.level]}`}
+      <ol class="relative border-l border-neutral-800">
+        {headings.map((heading) => (
+          <li
+            class={`relative ${
+              heading.level === 3 ? "pl-5" : "pl-4"
+            } leading-6`}
+          >
+            <a
+              class="toc-link group flex gap-3 py-2 text-neutral-400 no-underline"
               href={`#${heading.id}`}
               data-toc-id={heading.id}
               data-toc-level={heading.level}
             >
               <span class={bulletClass} aria-hidden="true" />
               <span class="flex-1 leading-[1.35]">{heading.text}</span>
+              <span
+                class="toc-bullet mt-[6px] h-[6px] w-[6px] rounded-full bg-neutral-600"
+                aria-hidden="true"
+              />
+              <span class="flex-1 text-sm">{heading.text}</span>
             </a>
           </li>
         ))}
@@ -60,6 +81,16 @@ const bulletClass =
   );
 
   const setActive = (id) => {
+  const links = Array.from(
+    document.querySelectorAll<HTMLAnchorElement>("[data-toc-id]")
+  );
+  const headings = Array.from(
+    document.querySelectorAll<HTMLElement>(
+      ".article-content h2[id], .article-content h3[id]"
+    )
+  );
+
+  const setActive = (id?: string) => {
     links.forEach((link) => {
       const active = link.dataset.tocId === id;
       link.classList.toggle("toc-active", active);
@@ -90,12 +121,14 @@ const bulletClass =
 
   links.forEach((link) => {
     link.addEventListener('click', (event) => {
+    link.addEventListener("click", (event) => {
       event.preventDefault();
       const targetId = link.dataset.tocId;
       const target = targetId ? document.getElementById(targetId) : null;
 
       if (target) {
         target.scrollIntoView({ behavior: 'auto', block: 'start' });
+        target.scrollIntoView({ behavior: "auto", block: "start" });
         setActive(targetId);
       }
     });
@@ -105,6 +138,11 @@ const bulletClass =
 <style>
   .toc-link {
     @apply relative transition-none hover:text-neutral-100 focus-visible:outline-none focus-visible:text-neutral-100;
+    @apply relative transition-none;
+  }
+
+  .toc-link:hover {
+    @apply text-neutral-200;
   }
 
   .toc-active {
