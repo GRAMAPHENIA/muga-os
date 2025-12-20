@@ -1,0 +1,29 @@
+---
+// Componente Card reutilizable
+// Single Responsibility: Renderizar contenedores de contenido
+// Dependency Inversion: Acepta contenido mediante slots
+
+export interface Props {
+  variant?: 'default' | 'featured' | 'minimal';
+  class?: string;
+  as?: 'article' | 'section' | 'div';
+}
+
+const {
+  variant = 'default',
+  class: className = '',
+  as: Element = 'div'
+} = Astro.props;
+
+const variants = {
+  default: 'bg-neutral-900/60 border border-neutral-700/50',
+  featured: 'bg-neutral-900/80 border border-neutral-600/50',
+  minimal: 'border-b border-neutral-800 pb-8 last:border-b-0'
+};
+
+const classes = `${variants[variant]} ${className}`;
+---
+
+<Element class={classes}>
+  <slot />
+</Element>

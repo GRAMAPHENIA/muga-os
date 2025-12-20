@@ -1,0 +1,110 @@
+---
+// Componente LazyImage para carga diferida de imágenes
+// Single Responsibility: Manejar carga lazy de imágenes
+// Performance: Mejora el rendimiento de carga de página
+
+export interface Props {
+  src: string;
+  alt: string;
+  class?: string;
+  width?: number;
+  height?: number;
+  loading?: 'lazy' | 'eager';
+  decoding?: 'async' | 'sync' | 'auto';
+  placeholder?: string;
+}
+
+const {
+  src,
+  alt,
+  class: className = '',
+  width,
+  height,
+  loading = 'lazy',
+  decoding = 'async',
+  placeholder = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMjYyNjI2Ii8+PC9zdmc+'
+} = Astro.props;
+
+// Generar srcset para responsive images si es necesario
+const generateSrcSet = (baseSrc: string) => {
+  if (baseSrc.includes('images/')) {
+    const baseName = baseSrc.replace(/\.[^/.]+$/, '');
+    const extension = baseSrc.split('.').pop();
+    return `${baseName}-400w.${extension} 400w, ${baseName}-800w.${extension} 800w, ${baseSrc} 1200w`;
+  }
+  return undefined;
+};
+
+const srcSet = generateSrcSet(src);
+---
+
+<img
+  src={loading === 'eager' ? src : placeholder}
+  data-src={loading === 'lazy' ? src : undefined}
+  srcset={loading === 'eager' && srcSet ? srcSet : undefined}
+  data-srcset={loading === 'lazy' && srcSet ? srcSet : undefined}
+  alt={alt}
+  class={`transition-opacity duration-300 ${className}`}
+  width={width}
+  height={height}
+  loading={loading}
+  decoding={decoding}
+  onload="this.style.opacity='1'"
+  style="opacity: 0;"
+/>
+
+<script>
+  // Intersection Observer para lazy loading
+  document.addEventListener('DOMContentLoaded', () => {
+    if ('IntersectionObserver' in window) {
+      const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target as HTMLImageElement;
+            
+            // Cargar imagen real
+            if (img.dataset.src) {
+              img.src = img.dataset.src;
+              img.removeAttribute('data-src');
+            }
+            
+            // Cargar srcset si existe
+            if (img.dataset.srcset) {
+              img.srcset = img.dataset.srcset;
+              img.removeAttribute('data-srcset');
+            }
+            
+            // Cuando la imagen se carga, mostrarla
+            img.onload = () => {
+              img.style.opacity = '1';
+            };
+            
+            observer.unobserve(img);
+          }
+        });
+      }, {
+        rootMargin: '50px 0px',
+        threshold: 0.01
+      });
+
+      // Observar todas las imágenes lazy
+      document.querySelectorAll('img[data-src]').forEach(img => {
+        imageObserver.observe(img);
+      });
+    } else {
+      // Fallback para navegadores sin IntersectionObserver
+      document.querySelectorAll('img[data-src]').forEach(img => {
+        const image = img as HTMLImageElement;
+        if (image.dataset.src) {
+          image.src = image.dataset.src;
+          image.removeAttribute('data-src');
+        }
+        if (image.dataset.srcset) {
+          image.srcset = image.dataset.srcset;
+          image.removeAttribute('data-srcset');
+        }
+        image.style.opacity = '1';
+      });
+    }
+  });
+</script>

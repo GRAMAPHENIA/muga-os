@@ -1,0 +1,82 @@
+---
+// Componente BlogMetadata para información del artículo
+// Single Responsibility: Mostrar metadatos del post
+// Interface Segregation: Props específicas para metadatos
+
+import Typography from '../ui/Typography.astro';
+import Badge from '../ui/Badge.astro';
+
+export interface Props {
+  area?: string;
+  status?: string;
+  date?: Date;
+  tags?: string[];
+}
+
+const { area, status, date, tags = [] } = Astro.props;
+
+// Datos estructurados para el tutorial
+const tutorialData = [
+  { label: 'Serie', value: 'Desafío diario — Biblioteca de materiales' },
+  { label: 'Versión', value: 'Blender 4.5' },
+  { label: 'Enfoque', value: '100% procedural (sin texturas externas)' },
+  { label: 'Dificultad', value: 'Inicial / Base' },
+  { label: 'Tiempo estimado', value: '20–40 min' }
+];
+---
+
+<section aria-label="Metadatos del artículo" class="my-12">
+  <Typography as="h2" variant="heading" class="mb-6">
+    Información del Tutorial
+  </Typography>
+  
+  <dl class="grid grid-cols-1 md:grid-cols-2 gap-6" role="list">
+    {tutorialData.map(({ label, value }) => (
+      <div class="bg-neutral-700 p-6" role="listitem">
+        <dt class="font-semibold text-white uppercase text-sm tracking-wide mb-2">
+          {label}
+        </dt>
+        <dd class="text-neutral-300">
+          {value}
+        </dd>
+      </div>
+    ))}
+  </dl>
+
+  <!-- Metadatos adicionales -->
+  {(area || status || date || tags.length > 0) && (
+    <div class="mt-8 flex flex-wrap items-center gap-4">
+      {area && (
+        <Badge variant="accent" size="md">
+          {area}
+        </Badge>
+      )}
+      
+      {status && status !== 'Publicado' && (
+        <Badge variant="status" size="md">
+          {status}
+        </Badge>
+      )}
+      
+      {date && (
+        <Typography as="time" variant="label" datetime={date.toISOString()}>
+          {date.toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })}
+        </Typography>
+      )}
+      
+      {tags.length > 0 && (
+        <div class="flex flex-wrap gap-2" role="list" aria-label="Etiquetas del artículo">
+          {tags.map((tag) => (
+            <Badge variant="secondary" size="sm" role="listitem">
+              #{tag}
+            </Badge>
+          ))}
+        </div>
+      )}
+    </div>
+  )}
+</section>

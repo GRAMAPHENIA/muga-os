@@ -1,0 +1,37 @@
+---
+// Componente Badge para etiquetas y categorías
+// Single Responsibility: Renderizar badges/etiquetas
+// Interface Segregation: Props específicas para badges
+
+export interface Props {
+  variant?: 'primary' | 'secondary' | 'accent' | 'status';
+  size?: 'sm' | 'md';
+  class?: string;
+}
+
+const {
+  variant = 'secondary',
+  size = 'sm',
+  class: className = ''
+} = Astro.props;
+
+const baseStyles = 'inline-flex items-center justify-center font-medium uppercase tracking-wide';
+
+const variants = {
+  primary: 'bg-white text-black',
+  secondary: 'bg-neutral-800 text-neutral-300 border border-neutral-700/30',
+  accent: 'bg-red-500/20 text-white',
+  status: 'bg-neutral-700 text-neutral-400'
+};
+
+const sizes = {
+  sm: 'px-2 py-1 text-xs',
+  md: 'px-3 py-1 text-sm'
+};
+
+const classes = `${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`;
+---
+
+<span class={classes} role="status" aria-label={`Badge: ${Astro.slots.default}`}>
+  <slot />
+</span>

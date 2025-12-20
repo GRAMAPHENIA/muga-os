@@ -1,0 +1,43 @@
+---
+// Componente BlogBreadcrumb para navegación
+// Single Responsibility: Manejar navegación breadcrumb
+// Accesibilidad: Implementa ARIA labels y estructura semántica
+
+export interface Props {
+  category?: string;
+}
+
+const { category } = Astro.props;
+---
+
+<nav aria-label="Navegación breadcrumb" class="mb-8">
+  <ol class="flex items-center space-x-2 text-sm text-neutral-400">
+    <li>
+      <a 
+        href="/blog" 
+        class="hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-neutral-950"
+        aria-label="Ir al blog principal"
+      >
+        Blog
+      </a>
+    </li>
+    <li aria-hidden="true" class="mx-2">/</li>
+    {category && (
+      <>
+        <li>
+          <a 
+            href={`/blog/categoria/${category.toLowerCase()}`}
+            class="hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-neutral-950"
+            aria-label={`Ir a la categoría ${category}`}
+          >
+            {category}
+          </a>
+        </li>
+        <li aria-hidden="true" class="mx-2">/</li>
+      </>
+    )}
+    <li aria-current="page" class="text-neutral-300">
+      Artículo actual
+    </li>
+  </ol>
+</nav>

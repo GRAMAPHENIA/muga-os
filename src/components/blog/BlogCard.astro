@@ -1,0 +1,199 @@
+---
+// Componente BlogCard para listas de posts
+// Single Responsibility: Renderizar tarjeta de post en listas
+// Open/Closed: Extensible mediante props
+
+import Typography from '../ui/Typography.astro';
+import Badge from '../ui/Badge.astro';
+import Button from '../ui/Button.astro';
+import Card from '../ui/Card.astro';
+import LazyImage from '../ui/LazyImage.astro';
+
+export interface Props {
+  title: string;
+  slug: string;
+  area?: string;
+  category?: string[];
+  status?: string;
+  date?: Date;
+  tags?: string[];
+  image?: string;
+  featured?: boolean;
+}
+
+const {
+  title,
+  slug,
+  area,
+  category = [],
+  status,
+  date,
+  tags = [],
+  image,
+  featured = false
+} = Astro.props;
+
+const cardVariant = featured ? 'featured' : 'default';
+---
+
+<Card variant={cardVariant} as="article" class={featured ? 'overflow-hidden' : 'p-6'}>
+  {featured ? (
+    <!-- Featured Post Layout -->
+    <div class="grid lg:grid-cols-3 gap-0 min-h-[700px]">
+      <div class="lg:col-span-2 p-16 lg:p-20 flex flex-col justify-center">
+        <div class="flex flex-col items-left align items-start gap-4 mb-8">
+          <Badge variant="accent" size="md">
+            Portada
+          </Badge>
+          {area && (
+            <Badge variant="status" size="sm">
+              {area.toLowerCase()}
+            </Badge>
+          )}
+        </div>
+        
+        <Typography as="h2" variant="title" class="mb-10 leading-tight tracking-tight">
+          <a 
+            href={`/blog/${slug}`} 
+            class="hover:text-neutral-300 transition-colors uppercase focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-neutral-950"
+            aria-label={`Leer artículo: ${title}`}
+          >
+            {title}
+          </a>
+        </Typography>
+        
+        <div class="flex flex-wrap items-center gap-6 text-base mb-12">
+          {date && (
+            <Typography as="time" variant="label" datetime={date.toISOString()}>
+              {date.toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </Typography>
+          )}
+          
+          {tags.length > 0 && (
+            <div class="flex gap-3" role="list" aria-label="Etiquetas">
+              {tags.slice(0, 2).map((tag) => (
+                <Badge variant="secondary" size="sm" role="listitem">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          )}
+        </div>
+        
+        <Button 
+          href={`/blog/${slug}`}
+          variant="primary"
+          size="lg"
+          class="self-start"
+          ariaLabel={`Leer publicación completa: ${title}`}
+        >
+          Leer Publicación Completa →
+        </Button>
+      </div>
+      
+      <!-- Featured Image -->
+      <div class="lg:col-span-1 bg-neutral-800/30 flex items-center justify-center overflow-hidden">
+        {image ? (
+          <LazyImage
+            src={image}
+            alt={`Imagen destacada: ${title}`}
+            class="w-full h-full object-cover"
+            loading="eager"
+            decoding="async"
+          />
+        ) : (
+          <div class="text-center">
+            <svg class="w-32 h-32 text-neutral-500 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <Typography variant="caption" class="uppercase tracking-wide font-medium">
+              Imagen Destacada
+            </Typography>
+          </div>
+        )}
+      </div>
+    </div>
+  ) : (
+    <!-- Regular Post Layout -->
+    <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+      <div class="flex-1">
+        <div class="flex items-center gap-3 mb-3">
+          {area && (
+            <Badge variant="secondary" size="md">
+              {area}
+            </Badge>
+          )}
+          
+          {status && status !== 'Publicado' && (
+            <Badge variant="status" size="sm">
+              {status}
+            </Badge>
+          )}
+        </div>
+
+        <Typography as="h3" variant="subtitle" class="mb-4 leading-tight">
+          <a
+            href={`/blog/${slug}`}
+            class="hover:text-neutral-300 transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-neutral-950"
+            aria-label={`Leer artículo: ${title}`}
+          >
+            {title}
+          </a>
+        </Typography>
+
+        <div class="flex flex-wrap items-center gap-4 text-sm mb-4">
+          {date && (
+            <Typography as="time" variant="label" datetime={date.toISOString()}>
+              {date.toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+              })}
+            </Typography>
+          )}
+
+          {category.length > 0 && (
+            <div class="flex gap-2" role="list" aria-label="Categorías">
+              {category.slice(0, 2).map((cat) => (
+                <Badge variant="secondary" size="sm" role="listitem">
+                  {cat}
+                </Badge>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {tags.length > 0 && (
+          <div class="flex gap-2 mb-4" role="list" aria-label="Etiquetas">
+            {tags.slice(0, 3).map((tag) => (
+              <Badge variant="secondary" size="sm" role="listitem">
+                #{tag}
+              </Badge>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div class="flex-shrink-0 flex items-center gap-3">
+        <Button 
+          href={`/blog/${slug}`}
+          variant="primary"
+          size="md"
+          ariaLabel={`Leer post: ${title}`}
+        >
+          Leer Post
+        </Button>
+        
+        <div class="w-20 h-20 bg-neutral-800/50 flex items-center justify-center">
+          <svg class="w-8 h-8 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+  )}
+</Card>

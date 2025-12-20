@@ -1,5 +1,9 @@
 ---
+// Página principal refactorizada con componentes SOLID
 import Layout from '../layouts/Layout.astro';
+import Typography from '../components/ui/Typography.astro';
+import Button from '../components/ui/Button.astro';
+import BlogCard from '../components/blog/BlogCard.astro';
 import { getBlogPosts } from '../lib/blog';
 
 const recentPosts = await getBlogPosts();
@@ -7,175 +11,112 @@ const featuredPost = recentPosts[0];
 const secondaryPosts = recentPosts.slice(1, 3);
 ---
 
-<Layout title="Inicio - Muga OS" description="Bienvenido a Muga OS">
+<Layout 
+  title="Inicio - Muga OS" 
+  description="Bienvenido a Muga OS. Un espacio donde compartimos pensamientos, proyectos y experiencias relacionadas con el desarrollo y diseño."
+  type="website"
+>
   <!-- Hero Section -->
-  <section class="px-6 pt-32 flex items-center justify-center text-center">
+  <section class="px-6 pt-32 flex items-center justify-center text-center" role="banner">
     <div class="text-center">
-      <h1 class="text-4xl md:text-6xl font-bold text-white mb-6  tracking-tight">
+      <Typography as="h1" variant="title" class="mb-6">
         MUGA OS
-      </h1>
-      <p class="text-lg text-neutral-300 max-w-2xl mx-auto mb-8 leading-relaxed">
+      </Typography>
+      
+      <Typography variant="body" class="max-w-2xl mx-auto mb-8 text-lg">
         Un espacio donde compartimos pensamientos, proyectos y experiencias.
         Todo conectado directamente desde nuestro sistema y procesos.
-      </p>
-      <a 
+      </Typography>
+      
+      <Button 
         href="/blog" 
-        class="inline-block bg-white text-black px-8 py-3 hover:bg-neutral-200 transition-colors font-medium text-sm uppercase tracking-wide"
+        variant="primary"
+        size="md"
+        ariaLabel="Ir al blog para ver todas las publicaciones"
       >
         Ver Blog
-      </a>
+      </Button>
     </div>
   </section>
 
-  <!-- Featured Post - Newspaper Style -->
-  {featuredPost ? (
-    <section class="px-6 py-24">
+  <!-- Featured Post -->
+  {featuredPost && (
+    <section class="px-6 py-24" aria-labelledby="featured-post-title">
       <div class="max-w-7xl mx-auto">
-        <article class="bg-neutral-900/60 border border-neutral-700/50 overflow-hidden">
-          <div class="grid lg:grid-cols-3 gap-0 min-h-[700px]">
-            <!-- Main Content -->
-            <div class="lg:col-span-2 p-16 lg:p-20 flex flex-col justify-center">
-              <div class="flex flex-col items-left align items-start  gap-4 mb-8">
-                <span class="bg-red-500/20 text-white px-4 py-2 text-sm font-bold uppercase tracking-wider">
-                  Portada
-                </span>
-                {featuredPost.data.area && (
-                  <span class="bg-neutral-800/80 text-neutral-300 px-2 py-1 text-xs tracking-wide">
-                    {featuredPost.data.area.toLowerCase()}
-                  </span>
-                )}
-              </div>
-              <h2 class="text-5xl lg:text-4xl font-black text-white mb-10 leading-tight tracking-tight">
-                <a href={`/blog/${featuredPost.slug}`} class="hover:text-neutral-300 transition-colors uppercase">
-                  {featuredPost.data.title}
-                </a>
-              </h2>
-              <div class="flex flex-wrap items-center gap-6 text-base mb-12">
-                {featuredPost.data.date && !isNaN(featuredPost.data.date.getTime()) && (
-                  <time class="text-neutral-400 uppercase tracking-wider font-medium">
-                    {featuredPost.data.date.toLocaleDateString('es-ES', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </time>
-                )}
-                {featuredPost.data.tags.length > 0 && (
-                  <div class="flex gap-3">
-                    {featuredPost.data.tags.slice(0, 2).map((tag) => (
-                      <span class="bg-neutral-800/60 text-neutral-300 px-2 py-1 text-xs tracking-wide">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <a
-                href={`/blog/${featuredPost.slug}`}
-                class="inline-flex items-center bg-white text-black px-8 py-4 hover:bg-neutral-200 transition-colors font-bold text-lg uppercase tracking-wider self-start"
-              >
-                Leer Publicación Completa →
-              </a>
-            </div>
-            <!-- Featured Image -->
-            <div class="lg:col-span-1 bg-neutral-800/30 flex items-center justify-center overflow-hidden">
-              {featuredPost.data.image ? (
-                <img
-                  src={featuredPost.data.image}
-                  alt={featuredPost.data.title}
-                  class="w-full h-full object-cover"
-                />
-              ) : (
-                <div class="text-center">
-                  <svg class="w-32 h-32 text-neutral-500 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                  </svg>
-                  <p class="text-neutral-500 text-sm uppercase tracking-wide font-medium">Imagen Destacada</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </article>
+        <Typography as="h2" variant="heading" class="sr-only" id="featured-post-title">
+          Publicación Destacada
+        </Typography>
+        
+        <BlogCard
+          title={featuredPost.data.title}
+          slug={featuredPost.slug}
+          area={featuredPost.data.area}
+          category={featuredPost.data.category}
+          status={featuredPost.data.status}
+          date={featuredPost.data.date}
+          tags={featuredPost.data.tags}
+          image={featuredPost.data.image}
+          featured={true}
+        />
       </div>
     </section>
-  ) : null}
+  )}
 
-  <!-- Secondary Posts - Simplified -->
-  {secondaryPosts && secondaryPosts.length > 0 ? (
-    <section class="px-6 py-20">
+  <!-- Secondary Posts -->
+  {secondaryPosts && secondaryPosts.length > 0 && (
+    <section class="px-6 py-20" aria-labelledby="recent-posts-title">
       <div class="max-w-5xl mx-auto">
-        <div class="space-y-8">
+        <Typography as="h2" variant="heading" class="sr-only" id="recent-posts-title">
+          Publicaciones Recientes
+        </Typography>
+        
+        <div class="space-y-8" role="list" aria-label="Lista de publicaciones recientes">
           {secondaryPosts.map((post) => (
-            <article class="border-b border-neutral-800 pb-8 last:border-b-0">
-              <div class="flex items-start justify-between gap-6">
-                <div class="flex-1">
-                  <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-3">
-                      {post.data.area && (
-                        <span class="bg-neutral-800 text-neutral-400 px-3 py-1 text-xs uppercase tracking-wide">
-                          {post.data.area}
-                        </span>
-                      )}
-                      {post.data.date && !isNaN(post.data.date.getTime()) && (
-                        <time class="text-neutral-500 uppercase tracking-wide text-xs">
-                          {post.data.date.toLocaleDateString('es-ES', {
-                            month: 'short',
-                            day: 'numeric'
-                          })}
-                        </time>
-                      )}
-                    </div>
-                  </div>
-                  <h3 class="text-2xl font-bold text-white mb-3">
-                    <a href={`/blog/${post.slug}`} class="hover:text-neutral-300 transition-colors">
-                      {post.data.title}
-                    </a>
-                  </h3>
-                  <a
-                    href={`/blog/${post.slug}`}
-                    class="inline-flex items-center text-neutral-400 hover:text-white font-medium text-sm uppercase tracking-wide"
-                  >
-                    Leer →
-                  </a>
-                </div>
-                <div class="flex-shrink-0">
-                  <div class="w-20 h-20 bg-neutral-800/50 flex items-center justify-center">
-                    <svg class="w-8 h-8 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </article>
+            <div role="listitem">
+              <BlogCard
+                title={post.data.title}
+                slug={post.slug}
+                area={post.data.area}
+                category={post.data.category}
+                status={post.data.status}
+                date={post.data.date}
+                tags={post.data.tags}
+                image={post.data.image}
+                featured={false}
+              />
+            </div>
           ))}
         </div>
+        
         <div class="text-center mt-16">
-          <a
+          <Button
             href="/blog"
-            class="inline-block text-neutral-400 hover:text-white transition-colors font-medium text-sm uppercase tracking-wide"
+            variant="ghost"
+            size="md"
+            ariaLabel="Ver todas las publicaciones del blog"
           >
             Ver todas las publicaciones →
-          </a>
+          </Button>
         </div>
       </div>
     </section>
-  ) : null}
+  )}
 
   <!-- No Posts Message -->
-  {(!featuredPost && (!secondaryPosts || secondaryPosts.length === 0)) ? (
-    <section class="px-6 py-16">
+  {(!featuredPost && (!secondaryPosts || secondaryPosts.length === 0)) && (
+    <section class="px-6 py-16" aria-labelledby="no-posts-title">
       <div class="text-center">
         <div class="diagonal-stripes bg-neutral-900/40 p-12 border border-neutral-800/60 max-w-2xl mx-auto">
-          <h2 class="text-xl font-semibold text-neutral-300 mb-2 uppercase tracking-wide">
+          <Typography as="h2" variant="heading" id="no-posts-title" class="mb-2">
             Sin Publicaciones
-          </h2>
-          <p class="text-neutral-500 text-sm">
+          </Typography>
+          <Typography variant="caption">
             Las publicaciones aparecerán aquí cuando las agregues a la carpeta src/content/blog/.
-          </p>
+          </Typography>
         </div>
       </div>
     </section>
-  ) : null}
+  )}
 </Layout>
 
 <style>

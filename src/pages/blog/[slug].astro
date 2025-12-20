@@ -1,6 +1,9 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import { getBlogPosts } from '../../lib/blog';
+// Página individual del blog refactorizada con TOC lateral
+import Layout from "../../layouts/Layout.astro";
+import Typography from "../../components/ui/Typography.astro";
+import Button from "../../components/ui/Button.astro";
+import { getBlogPosts } from "../../lib/blog";
 
 export async function getStaticPaths() {
   const posts = await getBlogPosts();
@@ -16,80 +19,104 @@ const tags = Array.isArray(post.data.tags) ? post.data.tags : [];
 const categories = Array.isArray(post.data.category) ? post.data.category : [];
 ---
 
-<Layout title={`${post.data.title} - Blog`}>
+<Layout
+  title={`${post.data.title} - Blog`}
+  description={`${post.data.title} - Artículo del blog de MUGA OS`}
+  type="article"
+  image={post.data.image}
+>
   <article class="max-w-6xl mx-auto relative">
-
     <!-- Header -->
-    <header class="px-8  border-b border-neutral-800/50">
-      <a
+    <header class="px-8 border-b border-neutral-800/50">
+      <Button
         href="/blog"
-        class="inline-flex items-center text-neutral-400 hover:text-white text-sm font-medium uppercase tracking-wide mb-12"
+        variant="ghost"
+        size="sm"
+        class="mb-4"
+        ariaLabel="Volver al blog principal"
       >
         ← Volver al blog
-      </a>
+      </Button>
 
       <div class="flex items-center gap-3 mb-10">
-        {post.data.area && (
-          <span class="bg-neutral-800 text-neutral-300 px-4 py-2 text-sm uppercase tracking-wide border border-neutral-700">
-            {post.data.area}
-          </span>
-        )}
+        {
+          post.data.area && (
+            <span class="bg-neutral-800 text-neutral-300 px-4 py-2 text-sm uppercase tracking-wide border border-neutral-700">
+              {post.data.area}
+            </span>
+          )
+        }
 
-        {categories.length > 0 && (
-          <span class="bg-neutral-700 text-neutral-400 px-4 py-2 text-sm uppercase tracking-wide border border-neutral-600">
-            {categories[0]}
-          </span>
-        )}
+        {
+          categories.length > 0 && (
+            <span class="bg-neutral-700 text-neutral-400 px-4 py-2 text-sm uppercase tracking-wide border border-neutral-600">
+              {categories[0]}
+            </span>
+          )
+        }
 
-        {post.data.status && post.data.status !== 'Publicado' && (
-          <span class="bg-neutral-600 text-neutral-500 px-4 py-2 text-sm uppercase tracking-wide">
-            {post.data.status}
-          </span>
-        )}
+        {
+          post.data.status && post.data.status !== "Publicado" && (
+            <span class="bg-neutral-600 text-neutral-500 px-4 py-2 text-sm uppercase tracking-wide">
+              {post.data.status}
+            </span>
+          )
+        }
       </div>
 
-      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-12 uppercase tracking-wide leading-tight max-w-4xl">
+      <Typography as="h1" variant="title" class="mb-12 leading-tight max-w-4xl">
         {post.data.title}
-      </h1>
+      </Typography>
 
-      {tags.length > 0 && (
-        <div class="flex gap-4 mb-1">
-          {tags.slice(0, 5).map(tag => (
-            <span class="text-neutral-500 text-xs uppercase tracking-wide">#{tag}</span>
-          ))}
-        </div>
-      )}
+      {
+        tags.length > 0 && (
+          <div class="flex gap-4 mb-1">
+            {tags.slice(0, 5).map((tag) => (
+              <span class="text-neutral-500 text-xs uppercase tracking-wide">
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )
+      }
 
-      {post.data.date instanceof Date && !isNaN(post.data.date.getTime()) && (
-        <time class="block text-neutral-400 text-xs uppercase tracking-wide mb-2">
-          {post.data.date.toLocaleDateString('es-ES', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-          })}
-        </time>
-      )}
+      {
+        post.data.date instanceof Date && !isNaN(post.data.date.getTime()) && (
+          <time class="block text-neutral-400 text-xs uppercase tracking-wide mb-2">
+            {post.data.date.toLocaleDateString("es-ES", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+          </time>
+        )
+      }
     </header>
 
     <!-- Contenido + Índice -->
-    <div class="grid grid-cols-1 lg:grid-cols-[1fr_10rem] gap-8 px-8 py-12">
-
-      <!-- Fondo continuo + texto controlado -->
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_12rem] gap-8 px-8 py-12">
+      <!-- Contenido principal -->
       <div class="bg-neutral-800/10 py-10">
         <div class="article-content max-w-prose mx-auto px-6">
-          <div set:html={post.body}></div>
+          <div set:html={post.body} />
         </div>
       </div>
 
-      <!-- Índice -->
+      <!-- Índice lateral -->
       <aside class="hidden lg:block sticky top-8 self-start">
-        <h3 class="text-white font-semibold mb-6 uppercase tracking-wide text-sm">
+        <Typography
+          as="h3"
+          variant="subheading"
+          class="mb-6 uppercase tracking-wide text-sm"
+        >
           Índice
-        </h3>
+        </Typography>
         <nav>
           <ol class="space-y-3 text-sm">
             <li><a class="toc-link" href="#objetivo">Objetivo del día</a></li>
-            <li><a class="toc-link" href="#criterios-muga">Criterios MUGA</a></li>
+            <li>
+              <a class="toc-link" href="#criterios-muga">Criterios MUGA</a>
+            </li>
             <li><a class="toc-link" href="#idea-base">Idea base</a></li>
             <li><a class="toc-link" href="#pasos">Paso a paso</a></li>
             <li><a class="toc-link" href="#ajuste-grano">Ajuste fino</a></li>
@@ -104,86 +131,133 @@ const categories = Array.isArray(post.data.category) ? post.data.category : [];
 
     <!-- Footer -->
     <footer class="px-8 py-24 border-t border-neutral-800/50 text-center">
-      <a
+      <Button
         href="/blog"
-        class="inline-block bg-white text-black px-12 py-4 hover:bg-neutral-200 transition-colors font-medium text-sm uppercase tracking-wide"
+        variant="primary"
+        size="lg"
+        ariaLabel="Ver más artículos del blog"
       >
         Ver más artículos
-      </a>
+      </Button>
     </footer>
-
   </article>
-</Layout>
 
-<script>
-  const headings = document.querySelectorAll('.article-content h2[id]');
-  const links = document.querySelectorAll('.toc-link');
+  <script lang="ts">
+    // TOC functionality
+    document.addEventListener("DOMContentLoaded", () => {
+      const headings = document.querySelectorAll(".article-content h2[id]");
+      const links = document.querySelectorAll(".toc-link");
 
-  function syncTOC() {
-    let current: string | undefined = undefined;
+      function syncTOC() {
+        let current = undefined;
 
-    headings.forEach((h) => {
-      const htmlH = h as HTMLElement;
-      if (window.scrollY >= htmlH.offsetTop - 100) {
-        current = htmlH.id;
+        headings.forEach((h) => {
+          const htmlH = h;
+          if (window.scrollY >= htmlH.offsetTop - 100) {
+            current = htmlH.id;
+          }
+        });
+
+        links.forEach((link) => {
+          link.classList.toggle(
+            "is-active",
+            link.getAttribute("href") === `#${current}`
+          );
+        });
       }
+
+      // Smooth scroll for TOC links
+      links.forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          const targetId = link.getAttribute("href")?.substring(1);
+          const targetElement = document.getElementById(targetId || "");
+
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }
+        });
+      });
+
+      window.addEventListener("scroll", syncTOC);
+      syncTOC();
     });
+  </script>
 
-    links.forEach(link => {
-      link.classList.toggle(
-        'is-active',
-        link.getAttribute('href') === `#${current}`
-      );
-    });
-  }
+  <style>
+    /* Estilos para el contenido del artículo */
+    .article-content {
+      @apply text-neutral-300 leading-relaxed;
+    }
 
-  window.addEventListener('scroll', syncTOC);
-  syncTOC();
-</script>
+    .article-content h2 {
+      @apply text-2xl font-bold text-white mt-24 mb-10 uppercase tracking-wide;
+    }
 
-<style>
-/* -------- Contenido -------- */
+    .article-content h3 {
+      @apply text-lg font-semibold text-neutral-200 mt-16 mb-8;
+    }
 
-.article-content {
-  @apply text-neutral-300 leading-relaxed;
-}
+    .article-content p {
+      @apply mb-8 text-lg leading-relaxed;
+    }
 
-.article-content h2 {
-  @apply text-2xl font-bold text-white mt-24 mb-10 uppercase tracking-wide;
-}
+    .article-content img {
+      @apply w-full my-12 border border-neutral-700;
+    }
 
-.article-content h3 {
-  @apply text-lg font-semibold text-neutral-200 mt-16 mb-8;
-}
+    .article-content ul,
+    .article-content ol {
+      @apply mb-8;
+    }
 
-.article-content p {
-  @apply mb-8 text-lg leading-relaxed;
-}
+    .article-content li {
+      @apply mb-3;
+    }
 
-.article-content img {
-  @apply w-full my-12 border border-neutral-700;
-}
+    .article-content section {
+      @apply mb-20;
+    }
 
-.article-content ul,
-.article-content ol {
-  @apply mb-8;
-}
+    .article-content strong {
+      @apply text-white;
+    }
 
-.article-content li {
-  @apply mb-3;
-}
+    .article-content em {
+      @apply text-neutral-200;
+    }
 
-.article-content section {
-  @apply mb-20;
-}
+    .article-content code {
+      @apply bg-neutral-700 px-2 py-1 text-neutral-200;
+    }
 
-/* -------- Índice -------- */
+    .article-content aside {
+      @apply bg-neutral-800 p-6 my-8 border-l-4 border-neutral-600;
+    }
 
-.toc-link {
-  @apply block text-neutral-500 hover:text-white transition-colors;
-}
+    .article-content figure {
+      @apply my-12;
+    }
 
-.toc-link.is-active {
-  @apply text-white;
-}
-</style>
+    .article-content figcaption {
+      @apply text-neutral-400 text-sm mt-4 italic;
+    }
+
+    /* Estilos para la TOC */
+    .toc-link {
+      @apply block text-neutral-500 transition-colors py-1 border-l-2 border-transparent pl-3;
+    }
+
+    .toc-link:hover {
+      @apply text-white border-neutral-600;
+    }
+
+    /* El estado activo tiene los mismos estilos que hover */
+    .toc-link.is-active {
+      @apply text-white border-white;
+    }
+  </style>
+</Layout>

@@ -1,260 +1,71 @@
 ---
+// Página del blog refactorizada sin funcionalidades de creación
 import Layout from '../layouts/Layout.astro';
+import Typography from '../components/ui/Typography.astro';
+import BlogCard from '../components/blog/BlogCard.astro';
 import { getBlogPosts } from "../lib/blog";
-import Toast from '../components/Toast.astro';
 
 const posts = await getBlogPosts();
-const created = Astro.url.searchParams.get('created');
-const updated = Astro.url.searchParams.get('updated');
 ---
 
-<Layout title="Blog - Muga OS" description="Todas mis publicaciones del blog">
+<Layout 
+  title="Blog - Muga OS" 
+  description="Todas mis publicaciones del blog. Pensamientos, experiencias y aprendizajes sobre desarrollo y diseño."
+  type="website"
+>
   <!-- Header -->
-  <section class="px-6 py-20">
+  <section class="px-6 py-20" role="banner">
     <div class="text-center">
-      <h1 class="text-3xl md:text-4xl font-bold text-white mb-6 uppercase tracking-wide">
+      <Typography as="h1" variant="title" class="mb-6">
         Blog
-      </h1>
-      <p class="text-lg text-neutral-300 max-w-2xl mx-auto mb-8 leading-relaxed">
+      </Typography>
+      
+      <Typography variant="body" class="max-w-2xl mx-auto mb-8 text-lg">
         Mis pensamientos, experiencias y aprendizajes. Todo versionado en Git.
-      </p>
-      {created && (
-        <div class="bg-green-900 border border-green-700/20 text-green-200 px-6 py-4 mb-8 max-w-2xl mx-auto">
-          ✅ Post "{created}" creado exitosamente. Aparecerá en la lista después de recargar la página.
-        </div>
-      )}
-      {updated && (
-        <div class="bg-blue-900 border border-blue-700/20 text-blue-200 px-6 py-4 mb-8 max-w-2xl mx-auto">
-          ✅ Post "{updated}" actualizado exitosamente.
-        </div>
-      )}
-      <a
-        href="/blog/new"
-        class="inline-block bg-white text-black px-8 py-3 hover:bg-neutral-200 transition-colors font-medium text-sm uppercase tracking-wide"
-      >
-        Agregar Nuevo Post
-      </a>
+      </Typography>
     </div>
   </section>
 
   <!-- Posts -->
   {posts.length === 0 ? (
-    <section class="px-6 py-16">
+    <section class="px-6 py-16" aria-labelledby="no-posts-title">
       <div class="text-center">
         <div class="diagonal-stripes bg-neutral-900/40 p-12 border border-neutral-800/60">
-          <h2 class="text-xl font-semibold text-neutral-300 mb-2 uppercase tracking-wide">
+          <Typography as="h2" variant="heading" id="no-posts-title" class="mb-2">
             No hay publicaciones todavía
-          </h2>
-          <p class="text-neutral-500 text-sm">
+          </Typography>
+          <Typography variant="caption">
             Las publicaciones aparecerán aquí cuando las agregues a la carpeta src/content/blog/.
-          </p>
+          </Typography>
         </div>
       </div>
     </section>
   ) : (
-    <section class="px-6 py-16">
-      <div class="space-y-8">
+    <section class="px-6 py-16" aria-labelledby="posts-list-title">
+      <Typography as="h2" variant="heading" class="sr-only" id="posts-list-title">
+        Lista de Publicaciones
+      </Typography>
+      
+      <div class="space-y-8" role="list" aria-label="Lista de todas las publicaciones del blog">
         {posts.map((post) => (
-          <article class="border border-neutral-800/50 hover:border-neutral-700/50 transition-colors">
-            <div class="p-6">
-              <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-                <div class="flex-1">
-                  <div class="flex items-center gap-3 mb-3">
-                    {post.data.area && (
-                      <span class="bg-neutral-800 text-neutral-300 px-3 py-1 text-xs uppercase tracking-wide font-medium">
-                        {post.data.area}
-                      </span>
-                    )}
-                    {post.data.status && post.data.status !== 'Publicado' && (
-                      <span class="bg-neutral-700 text-neutral-400 px-3 py-1 text-xs uppercase tracking-wide">
-                        {post.data.status}
-                      </span>
-                    )}
-                  </div>
-
-                  <h2 class="text-2xl font-bold text-white mb-4 leading-tight">
-                    <a
-                      href={`/blog/${post.slug}`}
-                      class="hover:text-neutral-300 transition-colors"
-                    >
-                      {post.data.title}
-                    </a>
-                  </h2>
-
-                  <div class="flex flex-wrap items-center gap-4 text-sm mb-4">
-                    {post.data.date && !isNaN(post.data.date.getTime()) && (
-                      <time class="text-neutral-400 uppercase tracking-wide text-xs font-medium">
-                        {post.data.date.toLocaleDateString('es-ES', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric'
-                        })}
-                      </time>
-                    )}
-
-                    {post.data.category && post.data.category.length > 0 && (
-                      <div class="flex gap-2">
-                        {post.data.category.slice(0, 2).map((cat) => (
-                          <span class="bg-neutral-800/50 text-neutral-300 px-2 py-1 text-xs uppercase tracking-wide border border-neutral-700/30">
-                            {cat}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {post.data.tags.length > 0 && (
-                    <div class="flex gap-2 mb-4">
-                      {post.data.tags.slice(0, 3).map((tag) => (
-                        <span class="bg-neutral-900/50 text-neutral-400 px-3 py-1 text-xs uppercase tracking-wide border border-neutral-800/30">
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div class="flex-shrink-0 flex items-center gap-3">
-                  <a
-                    href={`/blog/${post.slug}`}
-                    class="inline-flex items-center bg-white text-black px-6 py-2 hover:bg-neutral-200 transition-colors font-medium text-sm uppercase tracking-wide"
-                  >
-                    Leer Post
-                  </a>
-                  <div class="flex items-center gap-1 border-l border-neutral-800/50 pl-3 ml-3">
-                    <button
-                      class="p-2 text-neutral-500 hover:text-white hover:bg-neutral-800/50 transition-all"
-                      title="Editar post"
-                      onclick={`editPost('${post.slug}')`}
-                    >
-                      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                      </svg>
-                    </button>
-                    <button
-                      class="p-2 text-neutral-500 hover:text-red-400 hover:bg-neutral-800/50 transition-all"
-                      title="Eliminar post"
-                      onclick={`deletePost('${post.slug}', '${post.data.title}')`}
-                    >
-                      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </article>
+          <div role="listitem">
+            <BlogCard
+              title={post.data.title}
+              slug={post.slug}
+              area={post.data.area}
+              category={post.data.category}
+              status={post.data.status}
+              date={post.data.date}
+              tags={post.data.tags}
+              image={post.data.image}
+              featured={false}
+            />
+          </div>
         ))}
       </div>
     </section>
   )}
 </Layout>
-
-<script is:inline>
-  let pendingDeleteCallback = null;
-
-  async function deletePost(slug, title) {
-    pendingDeleteCallback = async () => {
-      try {
-        const response = await fetch('/api/delete-post', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ slug }),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-          showToast(result.message, 'success');
-          // Reload page after short delay
-          setTimeout(() => {
-            window.location.reload();
-          }, 1500);
-        } else {
-          showToast(result.error || 'Error al eliminar el post', 'error');
-        }
-      } catch (error) {
-        showToast('Error de conexión', 'error');
-      }
-    };
-
-    showConfirmationToast(`¿Estás seguro de que quieres eliminar el post "${title}"?`);
-  }
-
-  function editPost(slug) {
-    window.location.href = `/blog/edit/${slug}`;
-  }
-
-  function showConfirmationToast(message) {
-    // Create confirmation toast element
-    const toast = document.createElement('div');
-    toast.className = 'fixed top-4 right-4 z-50 p-4 shadow-lg max-w-md bg-yellow-900/10 border border-yellow-700/20 text-yellow-200';
-
-    toast.innerHTML = `
-      <div class="flex flex-col gap-3">
-        <div class="flex items-center">
-          <div class="mr-3">⚠️</div>
-          <p class="text-sm">${message}</p>
-        </div>
-        <div class="flex gap-2 justify-end">
-          <button onclick="this.closest('.toast-confirmation').remove(); pendingDeleteCallback = null;" class="px-3 py-1 text-xs bg-neutral-700 hover:bg-neutral-600 text-white transition-colors">
-            Cancelar
-          </button>
-          <button onclick="this.closest('.toast-confirmation').remove(); if(pendingDeleteCallback) { pendingDeleteCallback(); pendingDeleteCallback = null; }" class="px-3 py-1 text-xs bg-red-600/20 hover:bg-red-700/60 text-white transition-colors">
-            Eliminar
-          </button>
-        </div>
-      </div>
-    `;
-
-    toast.classList.add('toast-confirmation');
-    document.body.appendChild(toast);
-
-    // Auto-remove after 10 seconds if not interacted with
-    setTimeout(() => {
-      if (toast.parentElement) {
-        toast.remove();
-        pendingDeleteCallback = null;
-      }
-    }, 10000);
-  }
-
-  function showToast(message, type) {
-    // Create toast element
-    const toast = document.createElement('div');
-    toast.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-md ${
-      type === 'success' ? 'bg-green-900 border border-green-700 text-green-200' :
-      type === 'error' ? 'bg-red-900 border border-red-700 text-red-200' :
-      'bg-blue-900 border border-blue-700 text-blue-200'
-    }`;
-
-    toast.innerHTML = `
-      <div class="flex items-center justify-between">
-        <div class="flex items-center">
-          <div class="mr-3">
-            ${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}
-          </div>
-          <p class="text-sm">${message}</p>
-        </div>
-        <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-gray-400 hover:text-white transition-colors">
-          ✕
-        </button>
-      </div>
-    `;
-
-    document.body.appendChild(toast);
-
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-      if (toast.parentElement) {
-        toast.remove();
-      }
-    }, 5000);
-  }
-</script>
 
 <style>
   .diagonal-stripes {

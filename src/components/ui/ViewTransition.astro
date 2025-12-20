@@ -1,0 +1,139 @@
+---
+// Componente ViewTransition para transiciones personalizadas
+// Single Responsibility: Manejar transiciones específicas entre páginas
+
+export interface Props {
+  name?: string;
+  class?: string;
+}
+
+const {
+  name,
+  class: className = ''
+} = Astro.props;
+
+const transitionName = name ? `view-transition-name: ${name};` : '';
+---
+
+<div 
+  class={className}
+  style={transitionName}
+  transition:animate="slide"
+>
+  <slot />
+</div>
+
+<script>
+  // Configuración avanzada de view transitions
+  document.addEventListener('astro:before-preparation', () => {
+    // Preparar elementos para transición
+    const elements = document.querySelectorAll('[data-transition]');
+    elements.forEach(el => {
+      const transitionName = el.getAttribute('data-transition');
+      if (transitionName) {
+        (el as HTMLElement).style.viewTransitionName = transitionName;
+      }
+    });
+  });
+
+  document.addEventListener('astro:after-swap', () => {
+    // Limpiar después de la transición
+    const elements = document.querySelectorAll('[data-transition]');
+    elements.forEach(el => {
+      (el as HTMLElement).style.viewTransitionName = '';
+    });
+
+    // Re-inicializar componentes que lo necesiten
+    const event = new CustomEvent('page:loaded');
+    document.dispatchEvent(event);
+  });
+
+  // Transiciones personalizadas para diferentes tipos de navegación
+  document.addEventListener('astro:before-preparation', (event) => {
+    const fromUrl = event.detail?.from?.pathname;
+    const toUrl = event.detail?.to?.pathname;
+
+    // Transición específica para blog posts
+    if (fromUrl?.includes('/blog/') && toUrl?.includes('/blog/')) {
+      document.documentElement.dataset.transition = 'blog-to-blog';
+    }
+    // Transición para ir del blog a la home
+    else if (fromUrl?.includes('/blog') && toUrl === '/') {
+      document.documentElement.dataset.transition = 'blog-to-home';
+    }
+    // Transición por defecto
+    else {
+      document.documentElement.dataset.transition = 'default';
+    }
+  });
+</script>
+
+<style>
+  /* Transiciones personalizadas */
+  
+  /* Transición por defecto */
+  [data-transition="default"] ::view-transition-old(root) {
+    animation: fade-out 0.2s ease-in-out;
+  }
+
+  [data-transition="default"] ::view-transition-new(root) {
+    animation: fade-in 0.3s ease-in-out;
+  }
+
+  /* Transición entre posts del blog */
+  [data-transition="blog-to-blog"] ::view-transition-old(root) {
+    animation: slide-out-left 0.3s ease-in-out;
+  }
+
+  [data-transition="blog-to-blog"] ::view-transition-new(root) {
+    animation: slide-in-right 0.3s ease-in-out;
+  }
+
+  /* Transición del blog a home */
+  [data-transition="blog-to-home"] ::view-transition-old(root) {
+    animation: slide-out-down 0.3s ease-in-out;
+  }
+
+  [data-transition="blog-to-home"] ::view-transition-new(root) {
+    animation: slide-in-up 0.3s ease-in-out;
+  }
+
+  /* Animaciones */
+  @keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slide-out-left {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+  }
+
+  @keyframes slide-in-right {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+
+  @keyframes slide-out-down {
+    from { transform: translateY(0); }
+    to { transform: translateY(100%); }
+  }
+
+  @keyframes slide-in-up {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  /* Respeto por reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    [data-transition] ::view-transition-old(root),
+    [data-transition] ::view-transition-new(root) {
+      animation: none !important;
+    }
+  }
+</style>

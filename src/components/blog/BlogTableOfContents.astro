@@ -1,0 +1,63 @@
+---
+// Componente BlogTableOfContents
+// Single Responsibility: Generar tabla de contenidos
+// Accesibilidad: Navegación semántica y ARIA labels
+
+// Contenidos basados en la estructura del post existente
+const tableOfContents = [
+  { id: 'objetivo', title: 'Objetivo del día' },
+  { id: 'criterios-muga', title: 'Criterios MUGA' },
+  { id: 'idea-base', title: 'Idea base del material' },
+  { id: 'pasos', title: 'Paso a paso (nodos)' },
+  { id: 'ajuste-grano', title: 'Ajuste fino: achicar el grano (Noise Scale)' },
+  { id: 'validacion', title: 'Validación rápida' },
+  { id: 'errores', title: 'Errores comunes' },
+  { id: 'variaciones', title: 'Variaciones para iterar' },
+  { id: 'export', title: 'Checklist para publicar como asset' }
+];
+---
+
+<nav aria-label="Tabla de contenidos" class="my-12">
+  <h2 class="text-2xl font-bold text-white mb-6 uppercase tracking-wide">
+    Contenido
+  </h2>
+  
+  <ol class="list-decimal list-inside space-y-3 text-lg" role="list">
+    {tableOfContents.map(({ id, title }, index) => (
+      <li role="listitem">
+        <a 
+          href={`#${id}`}
+          class="text-neutral-400 hover:text-white underline transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-neutral-950"
+          aria-label={`Ir a la sección: ${title}`}
+        >
+          {title}
+        </a>
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<script>
+  // Smooth scroll para los enlaces internos
+  document.addEventListener('DOMContentLoaded', () => {
+    const tocLinks = document.querySelectorAll('nav[aria-label="Tabla de contenidos"] a[href^="#"]');
+    
+    tocLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href')?.substring(1);
+        const targetElement = document.getElementById(targetId || '');
+        
+        if (targetElement) {
+          targetElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+          
+          // Actualizar focus para accesibilidad
+          targetElement.focus({ preventScroll: true });
+        }
+      });
+    });
+  });
+</script>
