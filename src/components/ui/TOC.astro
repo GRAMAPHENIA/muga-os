@@ -87,7 +87,8 @@ const bulletClass =
     );
 
     headings.forEach((heading) => observer.observe(heading));
-    setActive(headings[0].id);
+    const initialId = location.hash ? location.hash.slice(1) : headings[0].id;
+    setActive(initialId);
   };
 
   const handleClick = (event) => {
