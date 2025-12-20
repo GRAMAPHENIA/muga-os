@@ -15,7 +15,7 @@ const { category } = Astro.props;
     <li>
       <a 
         href="/blog" 
-        class="hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-neutral-950"
+        class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
         aria-label="Ir al blog principal"
       >
         Blog
@@ -27,7 +27,7 @@ const { category } = Astro.props;
         <li>
           <a 
             href={`/blog/categoria/${category.toLowerCase()}`}
-            class="hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-neutral-950"
+            class="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
             aria-label={`Ir a la categoría ${category}`}
           >
             {category}

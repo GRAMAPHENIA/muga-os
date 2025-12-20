@@ -7,9 +7,38 @@ import TOC from "../../components/ui/TOC.astro";
 import type { TocHeading } from "../../components/ui/TOC.astro";
 import { getBlogPosts } from "../../lib/blog";
 
+const stripHtml = (value: string) => value.replace(/<[^>]*>/g, "").trim();
+
+const slugify = (value: string) =>
+  stripHtml(value)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+
+const ensureHeadingIds = (html: string) => {
+  const withSectionIds = html.replace(
+    /<section\s+[^>]*id="([^"]+)"([^>]*)>\s*(<h([23])(\b[^>]*)>)/gis,
+    (full, sectionId, sectionRest = "", headingTag, level, headingAttrs = "") => {
+      if (/\sid=/i.test(headingAttrs)) return full;
+      const headingWithId = `<h${level}${headingAttrs} id="${sectionId}">`;
+      return `<section id="${sectionId}"${sectionRest}>${headingWithId}`;
+    }
+  );
+
+  return withSectionIds.replace(/<h([23])(\b[^>]*)>(.*?)<\/h\1>/gis, (full, level, attrs = "", content) => {
+    const existingIdMatch = attrs.match(/\sid="([^"]+)"/i);
+    const id = existingIdMatch?.[1] ?? slugify(content);
+    const updatedAttrs = existingIdMatch ? attrs : `${attrs} id="${id}"`;
+
+    return `<h${level}${updatedAttrs}>${content}</h${level}>`;
+  });
+};
+
 const extractHeadings = (html: string): TocHeading[] => {
   const headingPattern = /<h([23])[^>]*id="([^"]+)"[^>]*>(.*?)<\/h\1>/gis;
-  const stripHtml = (value: string) => value.replace(/<[^>]*>/g, "").trim();
 
   return Array.from(html.matchAll(headingPattern)).map((match) => ({
     id: match[2],
@@ -30,7 +59,8 @@ const { post } = Astro.props;
 
 const tags = Array.isArray(post.data.tags) ? post.data.tags : [];
 const categories = Array.isArray(post.data.category) ? post.data.category : [];
-const headings = extractHeadings(post.body);
+const htmlWithIds = ensureHeadingIds(post.body);
+const headings = extractHeadings(htmlWithIds);
 ---
 
 <Layout
@@ -112,7 +142,7 @@ const headings = extractHeadings(post.body);
       <!-- Contenido principal -->
       <div class="bg-neutral-800/10 py-10">
         <div class="article-content max-w-prose mx-auto px-6">
-          <div set:html={post.body} />
+          <div set:html={htmlWithIds} />
         </div>
       </div>
 
