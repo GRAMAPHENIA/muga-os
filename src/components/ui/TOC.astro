@@ -1,0 +1,120 @@
+---
+import Typography from "./Typography.astro";
+
+export interface TocHeading {
+  id: string;
+  text: string;
+  level: 2 | 3;
+}
+
+interface Props {
+  headings: TocHeading[];
+}
+
+const { headings } = Astro.props;
+const listClass =
+  "relative pl-[11px] before:absolute before:left-0 before:top-0 before:h-full before:w-px before:bg-neutral-800/60";
+---
+{headings.length > 0 && (
+  <aside class="hidden lg:block w-[240px] sticky top-10 self-start">
+    <Typography
+      as="h3"
+      variant="subheading"
+      class="mb-4 uppercase tracking-[0.12em] text-[11px] text-neutral-500"
+    >
+      En esta página
+    </Typography>
+
+    <nav aria-label="Tabla de contenidos" class="text-sm text-neutral-400">
+      <ol class={listClass}>
+        {headings.map((heading) => (
+          <li
+            class={`relative ${
+              heading.level === 3 ? "pl-7" : "pl-4"
+            } leading-6`}
+          >
+            <a
+              class={`toc-link group flex gap-3 py-[9px] no-underline text-neutral-400 transition-colors duration-150 ${
+                heading.level === 3 ? "text-[13px]" : "text-sm"
+              }`}
+              href={`#${heading.id}`}
+              data-toc-id={heading.id}
+              data-toc-level={heading.level}
+            >
+              <span
+                class="toc-bullet mt-[7px] h-[6px] w-[6px] rounded-full bg-neutral-700 transition-colors duration-150"
+                aria-hidden="true"
+              />
+              <span class="flex-1 leading-[1.35]">{heading.text}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  </aside>
+)}
+
+<script>
+  const links = Array.from(document.querySelectorAll("[data-toc-id]"));
+  const headings = Array.from(
+    document.querySelectorAll(".article-content h2[id], .article-content h3[id]")
+  );
+
+  const setActive = (id?: string) => {
+    links.forEach((link) => {
+      const active = link.dataset.tocId === id;
+      link.classList.toggle("toc-active", active);
+      link.toggleAttribute("aria-current", active);
+    });
+  };
+
+  if (headings.length && links.length) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting && entry.target.id)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+
+        if (visible[0]?.target.id) {
+          setActive(visible[0].target.id);
+        }
+      },
+      {
+        rootMargin: "-40% 0px -40% 0px",
+        threshold: 0.1,
+      }
+    );
+
+    headings.forEach((heading) => observer.observe(heading));
+    setActive(headings[0].id);
+  }
+
+  links.forEach((link) => {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      const targetId = link.dataset.tocId;
+      const target = targetId ? document.getElementById(targetId) : null;
+
+      if (target) {
+        target.scrollIntoView({ behavior: "auto", block: "start" });
+        setActive(targetId);
+      }
+    });
+  });
+</script>
+
+<style>
+  .toc-link {
+    @apply relative transition-none hover:text-neutral-100 focus-visible:outline-none focus-visible:text-neutral-100;
+  }
+
+  .toc-active {
+    color: #ff5353;
+    font-weight: 600;
+  }
+
+  .toc-active .toc-bullet {
+    background-color: #ff5353;
+    box-shadow: 0 0 0 6px rgba(255, 83, 83, 0.08);
+  }
+</style>

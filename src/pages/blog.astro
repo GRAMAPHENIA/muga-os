@@ -48,7 +48,7 @@ const posts = await getBlogPosts();
       
       <div class="space-y-8" role="list" aria-label="Lista de todas las publicaciones del blog">
         {posts.map((post) => (
-          <div role="listitem">
+          <div role="listitem" key={post.slug}>
             <BlogCard
               title={post.data.title}
               slug={post.slug}
