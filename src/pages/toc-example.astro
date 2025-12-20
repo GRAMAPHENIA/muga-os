@@ -1,0 +1,96 @@
+---
+import Layout from "../layouts/Layout.astro";
+import TOC from "../components/ui/TOC.astro";
+import type { TocHeading } from "../components/ui/TOC.astro";
+
+const sections: TocHeading[] = [
+  { id: "introduccion", text: "Introducción", level: 2 },
+  { id: "arquitectura", text: "Arquitectura", level: 2 },
+  { id: "arquitectura-niveles", text: "Capas y niveles", level: 3 },
+  { id: "arquitectura-datos", text: "Modelo de datos", level: 3 },
+  { id: "rendimiento", text: "Rendimiento", level: 2 },
+  { id: "rendimiento-medir", text: "Cómo medimos", level: 3 },
+  { id: "rendimiento-acciones", text: "Acciones inmediatas", level: 3 },
+];
+---
+
+<Layout title="Ejemplo TOC" description="Ejemplo del componente de índice lateral">
+  <main class="max-w-6xl mx-auto px-8 py-16 grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-8">
+    <article class="article-content max-w-prose">
+      <h1 class="text-4xl font-bold mb-10 text-white">Ejemplo de TOC lateral</h1>
+
+      <section id="introduccion">
+        <h2 class="mb-4">Introducción</h2>
+        <p>
+          Este ejemplo muestra cómo se ve y funciona el componente de tabla de
+          contenidos. La columna derecha refleja la sección visible usando
+          IntersectionObserver y el acento #FF5353 en el enlace activo.
+        </p>
+      </section>
+
+      <section id="arquitectura">
+        <h2 class="mb-4">Arquitectura</h2>
+        <p>
+          Usa un listado plano sin tarjetas ni bullets visibles. Los títulos de
+          nivel 3 aparecen con sangría para mantener la jerarquía visual.
+        </p>
+
+        <h3 id="arquitectura-niveles" class="mb-3">Capas y niveles</h3>
+        <p>
+          El observador se configura con márgenes pensados para activar un único
+          ítem a la vez mientras haces scroll.
+        </p>
+
+        <h3 id="arquitectura-datos" class="mb-3">Modelo de datos</h3>
+        <p>
+          Cada enlace recibe un atributo <code>aria-current</code> cuando está
+          activo para mejorar la accesibilidad.
+        </p>
+      </section>
+
+      <section id="rendimiento">
+        <h2 class="mb-4">Rendimiento</h2>
+        <p>
+          El componente no depende de librerías externas y evita animaciones
+          para mantener la experiencia ligera.
+        </p>
+
+        <h3 id="rendimiento-medir" class="mb-3">Cómo medimos</h3>
+        <p>
+          Puedes reutilizar la misma clase <code>article-content</code> del
+          blog, que define tipografía neutra y espaciamiento cómodo.
+        </p>
+
+        <h3 id="rendimiento-acciones" class="mb-3">Acciones inmediatas</h3>
+        <p>
+          Al hacer click en un enlace, la página hace scroll directo a la
+          sección correspondiente sin transiciones.
+        </p>
+      </section>
+    </article>
+
+    <TOC headings={sections} />
+  </main>
+
+  <style>
+    .article-content {
+      @apply text-neutral-300 leading-relaxed;
+    }
+
+    .article-content h2 {
+      @apply text-2xl font-bold text-white mt-16;
+    }
+
+    .article-content h3 {
+      @apply text-lg font-semibold text-neutral-200 mt-10;
+    }
+
+    .article-content p {
+      @apply mb-6 text-lg leading-relaxed;
+    }
+
+    .article-content code {
+      @apply bg-neutral-800 px-2 py-1 rounded-sm text-neutral-100;
+    }
+  </style>
+</Layout>

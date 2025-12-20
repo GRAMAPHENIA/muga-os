@@ -1,9 +1,22 @@
 ---
-// Página individual del blog refactorizada con TOC lateral
+// Página individual del blog con TOC minimal inspirado en Supabase
 import Layout from "../../layouts/Layout.astro";
 import Typography from "../../components/ui/Typography.astro";
 import Button from "../../components/ui/Button.astro";
+import TOC from "../../components/ui/TOC.astro";
+import type { TocHeading } from "../../components/ui/TOC.astro";
 import { getBlogPosts } from "../../lib/blog";
+
+const extractHeadings = (html: string): TocHeading[] => {
+  const headingPattern = /<h([23])[^>]*id="([^"]+)"[^>]*>(.*?)<\/h\1>/gis;
+  const stripHtml = (value: string) => value.replace(/<[^>]*>/g, "").trim();
+
+  return Array.from(html.matchAll(headingPattern)).map((match) => ({
+    id: match[2],
+    text: stripHtml(match[3]),
+    level: Number(match[1]) as 2 | 3,
+  }));
+};
 
 export async function getStaticPaths() {
   const posts = await getBlogPosts();
@@ -17,6 +30,7 @@ const { post } = Astro.props;
 
 const tags = Array.isArray(post.data.tags) ? post.data.tags : [];
 const categories = Array.isArray(post.data.category) ? post.data.category : [];
+const headings = extractHeadings(post.body);
 ---
 
 <Layout
@@ -94,7 +108,7 @@ const categories = Array.isArray(post.data.category) ? post.data.category : [];
     </header>
 
     <!-- Contenido + Índice -->
-    <div class="grid grid-cols-1 lg:grid-cols-[1fr_12rem] gap-8 px-8 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-8 px-8 py-12">
       <!-- Contenido principal -->
       <div class="bg-neutral-800/10 py-10">
         <div class="article-content max-w-prose mx-auto px-6">
@@ -103,30 +117,7 @@ const categories = Array.isArray(post.data.category) ? post.data.category : [];
       </div>
 
       <!-- Índice lateral -->
-      <aside class="hidden lg:block sticky top-8 self-start">
-        <Typography
-          as="h3"
-          variant="subheading"
-          class="mb-6 uppercase tracking-wide text-sm"
-        >
-          Índice
-        </Typography>
-        <nav>
-          <ol class="space-y-3 text-sm">
-            <li><a class="toc-link" href="#objetivo">Objetivo del día</a></li>
-            <li>
-              <a class="toc-link" href="#criterios-muga">Criterios MUGA</a>
-            </li>
-            <li><a class="toc-link" href="#idea-base">Idea base</a></li>
-            <li><a class="toc-link" href="#pasos">Paso a paso</a></li>
-            <li><a class="toc-link" href="#ajuste-grano">Ajuste fino</a></li>
-            <li><a class="toc-link" href="#validacion">Validación</a></li>
-            <li><a class="toc-link" href="#errores">Errores comunes</a></li>
-            <li><a class="toc-link" href="#variaciones">Variaciones</a></li>
-            <li><a class="toc-link" href="#export">Checklist</a></li>
-          </ol>
-        </nav>
-      </aside>
+      <TOC headings={headings} />
     </div>
 
     <!-- Footer -->
@@ -141,51 +132,6 @@ const categories = Array.isArray(post.data.category) ? post.data.category : [];
       </Button>
     </footer>
   </article>
-
-  <script lang="ts">
-    // TOC functionality
-    document.addEventListener("DOMContentLoaded", () => {
-      const headings = document.querySelectorAll(".article-content h2[id]");
-      const links = document.querySelectorAll(".toc-link");
-
-      function syncTOC() {
-        let current = undefined;
-
-        headings.forEach((h) => {
-          const htmlH = h;
-          if (window.scrollY >= htmlH.offsetTop - 100) {
-            current = htmlH.id;
-          }
-        });
-
-        links.forEach((link) => {
-          link.classList.toggle(
-            "is-active",
-            link.getAttribute("href") === `#${current}`
-          );
-        });
-      }
-
-      // Smooth scroll for TOC links
-      links.forEach((link) => {
-        link.addEventListener("click", (e) => {
-          e.preventDefault();
-          const targetId = link.getAttribute("href")?.substring(1);
-          const targetElement = document.getElementById(targetId || "");
-
-          if (targetElement) {
-            targetElement.scrollIntoView({
-              behavior: "smooth",
-              block: "start",
-            });
-          }
-        });
-      });
-
-      window.addEventListener("scroll", syncTOC);
-      syncTOC();
-    });
-  </script>
 
   <style>
     /* Estilos para el contenido del artículo */
@@ -244,20 +190,6 @@ const categories = Array.isArray(post.data.category) ? post.data.category : [];
 
     .article-content figcaption {
       @apply text-neutral-400 text-sm mt-4 italic;
-    }
-
-    /* Estilos para la TOC */
-    .toc-link {
-      @apply block text-neutral-500 transition-colors py-1 border-l-2 border-transparent pl-3;
-    }
-
-    .toc-link:hover {
-      @apply text-white border-neutral-600;
-    }
-
-    /* El estado activo tiene los mismos estilos que hover */
-    .toc-link.is-active {
-      @apply text-white border-white;
     }
   </style>
 </Layout>
