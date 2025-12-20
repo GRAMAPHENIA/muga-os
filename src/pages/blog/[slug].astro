@@ -11,33 +11,36 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
+
+const tags = Array.isArray(post.data.tags) ? post.data.tags : [];
+const categories = Array.isArray(post.data.category) ? post.data.category : [];
 ---
 
 <Layout title={`${post.data.title} - Blog`}>
-  <article class="max-w-4xl mx-auto">
-    <!-- Header del post - Estilo periódico -->
-    <header class="px-6 py-12 border-b border-neutral-800/50">
-      <div class="mb-6">
-        <a
-          href="/blog"
-          class="inline-flex items-center text-neutral-400 hover:text-white text-sm font-medium uppercase tracking-wide mb-4"
-        >
-          ← Volver al blog
-        </a>
-      </div>
+  <article class="max-w-6xl mx-auto relative">
 
-      <!-- Badges de categoría y área -->
-      <div class="flex items-center gap-3 mb-6">
+    <!-- Header -->
+    <header class="px-8  border-b border-neutral-800/50">
+      <a
+        href="/blog"
+        class="inline-flex items-center text-neutral-400 hover:text-white text-sm font-medium uppercase tracking-wide mb-12"
+      >
+        ← Volver al blog
+      </a>
+
+      <div class="flex items-center gap-3 mb-10">
         {post.data.area && (
-          <span class="bg-neutral-800 text-neutral-300 px-4 py-2 text-sm uppercase tracking-wide font-medium border border-neutral-700">
+          <span class="bg-neutral-800 text-neutral-300 px-4 py-2 text-sm uppercase tracking-wide border border-neutral-700">
             {post.data.area}
           </span>
         )}
-        {post.data.category && post.data.category.length > 0 && (
+
+        {categories.length > 0 && (
           <span class="bg-neutral-700 text-neutral-400 px-4 py-2 text-sm uppercase tracking-wide border border-neutral-600">
-            {post.data.category[0]}
+            {categories[0]}
           </span>
         )}
+
         {post.data.status && post.data.status !== 'Publicado' && (
           <span class="bg-neutral-600 text-neutral-500 px-4 py-2 text-sm uppercase tracking-wide">
             {post.data.status}
@@ -45,73 +48,142 @@ const { post } = Astro.props;
         )}
       </div>
 
-      <!-- Título principal - Estilo headline -->
-      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight uppercase tracking-wide">
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-12 uppercase tracking-wide leading-tight max-w-4xl">
         {post.data.title}
       </h1>
 
-      <!-- Tags sutiles debajo del título -->
-      {post.data.tags.length > 0 && (
-        <div class="flex gap-2 mb-8">
-          {post.data.tags.slice(0, 5).map((tag) => (
+      {tags.length > 0 && (
+        <div class="flex gap-4 mb-1">
+          {tags.slice(0, 5).map(tag => (
             <span class="text-neutral-500 text-xs uppercase tracking-wide">#{tag}</span>
           ))}
         </div>
       )}
 
-      <!-- Fecha minimalista -->
-      {post.data.date && !isNaN(post.data.date.getTime()) && (
-        <div class="text-neutral-400 text-xs uppercase tracking-wide mb-6">
+      {post.data.date instanceof Date && !isNaN(post.data.date.getTime()) && (
+        <time class="block text-neutral-400 text-xs uppercase tracking-wide mb-2">
           {post.data.date.toLocaleDateString('es-ES', {
             day: 'numeric',
             month: 'long',
-            year: 'numeric'
+            year: 'numeric',
           })}
-        </div>
+        </time>
       )}
     </header>
 
-    <!-- Contenido del artículo - Minimalista -->
-    <div class="px-6 py-16">
-      <div class="max-w-3xl mx-auto">
-        <div class="article-content prose prose-lg max-w-none">
+    <!-- Contenido + Índice -->
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_10rem] gap-8 px-8 py-12">
+
+      <!-- Fondo continuo + texto controlado -->
+      <div class="bg-neutral-800/10 py-10">
+        <div class="article-content max-w-prose mx-auto px-6">
           <div set:html={post.body}></div>
         </div>
       </div>
+
+      <!-- Índice -->
+      <aside class="hidden lg:block sticky top-8 self-start">
+        <h3 class="text-white font-semibold mb-6 uppercase tracking-wide text-sm">
+          Índice
+        </h3>
+        <nav>
+          <ol class="space-y-3 text-sm">
+            <li><a class="toc-link" href="#objetivo">Objetivo del día</a></li>
+            <li><a class="toc-link" href="#criterios-muga">Criterios MUGA</a></li>
+            <li><a class="toc-link" href="#idea-base">Idea base</a></li>
+            <li><a class="toc-link" href="#pasos">Paso a paso</a></li>
+            <li><a class="toc-link" href="#ajuste-grano">Ajuste fino</a></li>
+            <li><a class="toc-link" href="#validacion">Validación</a></li>
+            <li><a class="toc-link" href="#errores">Errores comunes</a></li>
+            <li><a class="toc-link" href="#variaciones">Variaciones</a></li>
+            <li><a class="toc-link" href="#export">Checklist</a></li>
+          </ol>
+        </nav>
+      </aside>
     </div>
 
-    <!-- Navegación -->
-    <footer class="px-6 py-12 border-t border-neutral-800/50">
-      <div class="text-center">
-        <a
-          href="/blog"
-          class="inline-block bg-white text-black px-8 py-3 hover:bg-neutral-200 transition-colors font-medium text-sm uppercase tracking-wide"
-        >
-          Ver más artículos
-        </a>
-      </div>
+    <!-- Footer -->
+    <footer class="px-8 py-24 border-t border-neutral-800/50 text-center">
+      <a
+        href="/blog"
+        class="inline-block bg-white text-black px-12 py-4 hover:bg-neutral-200 transition-colors font-medium text-sm uppercase tracking-wide"
+      >
+        Ver más artículos
+      </a>
     </footer>
+
   </article>
 </Layout>
 
+<script>
+  const headings = document.querySelectorAll('.article-content h2[id]');
+  const links = document.querySelectorAll('.toc-link');
+
+  function syncTOC() {
+    let current: string | undefined = undefined;
+
+    headings.forEach((h) => {
+      const htmlH = h as HTMLElement;
+      if (window.scrollY >= htmlH.offsetTop - 100) {
+        current = htmlH.id;
+      }
+    });
+
+    links.forEach(link => {
+      link.classList.toggle(
+        'is-active',
+        link.getAttribute('href') === `#${current}`
+      );
+    });
+  }
+
+  window.addEventListener('scroll', syncTOC);
+  syncTOC();
+</script>
+
 <style>
-  .article-content {
-    @apply text-neutral-300 leading-relaxed;
-  }
+/* -------- Contenido -------- */
 
-  .article-content h2 {
-    @apply text-2xl font-bold text-white mt-12 mb-6 uppercase tracking-wide;
-  }
+.article-content {
+  @apply text-neutral-300 leading-relaxed;
+}
 
-  .article-content h3 {
-    @apply text-lg font-semibold text-neutral-200 mt-8 mb-4;
-  }
+.article-content h2 {
+  @apply text-2xl font-bold text-white mt-24 mb-10 uppercase tracking-wide;
+}
 
-  .article-content p {
-    @apply mb-4 text-lg;
-  }
+.article-content h3 {
+  @apply text-lg font-semibold text-neutral-200 mt-16 mb-8;
+}
 
-  .article-content img {
-    @apply w-full my-6 border border-neutral-700;
-  }
+.article-content p {
+  @apply mb-8 text-lg leading-relaxed;
+}
+
+.article-content img {
+  @apply w-full my-12 border border-neutral-700;
+}
+
+.article-content ul,
+.article-content ol {
+  @apply mb-8;
+}
+
+.article-content li {
+  @apply mb-3;
+}
+
+.article-content section {
+  @apply mb-20;
+}
+
+/* -------- Índice -------- */
+
+.toc-link {
+  @apply block text-neutral-500 hover:text-white transition-colors;
+}
+
+.toc-link.is-active {
+  @apply text-white;
+}
 </style>
