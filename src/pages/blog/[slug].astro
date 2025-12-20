@@ -122,9 +122,10 @@ const headings = extractHeadings(post.body);
         <Typography
           as="h3"
           variant="subheading"
+          class="mb-3 uppercase tracking-wide text-xs text-neutral-400"
           class="mb-4 uppercase tracking-wide text-sm"
         >
-          Índice
+          En esta página
         </Typography>
 
         <nav class="toc" aria-label="Tabla de contenidos">
@@ -278,6 +279,15 @@ const headings = extractHeadings(post.body);
 
     /* Estilos para la TOC */
     :root {
+      --toc-accent: #ff5353;
+    }
+
+    .toc {
+      @apply text-sm text-neutral-400;
+    }
+
+    .toc-list {
+      @apply space-y-2 pl-4 relative;
       --toc-accent: #FF5353;
     }
 
@@ -292,6 +302,15 @@ const headings = extractHeadings(post.body);
     .toc-list::before {
       content: "";
       position: absolute;
+      left: 0;
+      top: 0.35rem;
+      bottom: 0.35rem;
+      width: 1px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .toc-link {
+      @apply block pl-4 py-1.5 leading-snug text-neutral-400 transition-colors relative;
       left: 0.5rem;
       top: 0.35rem;
       bottom: 0.35rem;
@@ -307,6 +326,13 @@ const headings = extractHeadings(post.body);
     .toc-link::before {
       content: "";
       position: absolute;
+      left: -0.35rem;
+      top: 50%;
+      width: 6px;
+      height: 6px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.12);
+      transform: translate(-50%, -50%);
       left: 0.2rem;
       top: 50%;
       width: 8px;
@@ -318,6 +344,7 @@ const headings = extractHeadings(post.body);
     }
 
     .toc-link:hover {
+      color: #f3f4f6;
       color: #f7f7f7;
       border-left-color: rgba(255, 255, 255, 0.08);
     }
@@ -331,6 +358,9 @@ const headings = extractHeadings(post.body);
 
     .toc-link.is-active::before {
       background: var(--toc-accent);
+      box-shadow: 0 0 0 4px rgba(255, 83, 83, 0.18);
+      width: 8px;
+      height: 8px;
       box-shadow: 0 0 0 4px rgba(255, 83, 83, 0.15);
       width: 10px;
       height: 10px;
