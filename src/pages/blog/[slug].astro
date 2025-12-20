@@ -1,9 +1,22 @@
 ---
-// Página individual del blog refactorizada con TOC lateral
+// Página individual del blog con TOC minimal inspirado en Supabase
 import Layout from "../../layouts/Layout.astro";
 import Typography from "../../components/ui/Typography.astro";
 import Button from "../../components/ui/Button.astro";
+import TOC from "../../components/ui/TOC.astro";
+import type { TocHeading } from "../../components/ui/TOC.astro";
 import { getBlogPosts } from "../../lib/blog";
+
+const extractHeadings = (html: string): TocHeading[] => {
+  const headingPattern = /<h([23])[^>]*id="([^"]+)"[^>]*>(.*?)<\/h\1>/gis;
+  const stripHtml = (value: string) => value.replace(/<[^>]*>/g, "").trim();
+
+  return Array.from(html.matchAll(headingPattern)).map((match) => ({
+    id: match[2],
+    text: stripHtml(match[3]),
+    level: Number(match[1]) as 2 | 3,
+  }));
+};
 
 export async function getStaticPaths() {
   const posts = await getBlogPosts();
@@ -17,6 +30,7 @@ const { post } = Astro.props;
 
 const tags = Array.isArray(post.data.tags) ? post.data.tags : [];
 const categories = Array.isArray(post.data.category) ? post.data.category : [];
+const headings = extractHeadings(post.body);
 ---
 
 <Layout
@@ -94,7 +108,7 @@ const categories = Array.isArray(post.data.category) ? post.data.category : [];
     </header>
 
     <!-- Contenido + Índice -->
-    <div class="grid grid-cols-1 lg:grid-cols-[1fr_12rem] gap-8 px-8 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-8 px-8 py-12">
       <!-- Contenido principal -->
       <div class="bg-neutral-800/10 py-10">
         <div class="article-content max-w-prose mx-auto px-6">
@@ -103,11 +117,13 @@ const categories = Array.isArray(post.data.category) ? post.data.category : [];
       </div>
 
       <!-- Índice lateral -->
+      <TOC headings={headings} />
       <aside class="hidden lg:block sticky top-8 self-start">
         <Typography
           as="h3"
           variant="subheading"
           class="mb-3 uppercase tracking-wide text-xs text-neutral-400"
+          class="mb-4 uppercase tracking-wide text-sm"
         >
           En esta página
         </Typography>
@@ -272,6 +288,15 @@ const categories = Array.isArray(post.data.category) ? post.data.category : [];
 
     .toc-list {
       @apply space-y-2 pl-4 relative;
+      --toc-accent: #FF5353;
+    }
+
+    .toc {
+      @apply bg-neutral-900/70 border border-neutral-800 rounded-lg p-4 shadow-lg;
+    }
+
+    .toc-list {
+      @apply space-y-1 pl-4 relative;
     }
 
     .toc-list::before {
@@ -286,6 +311,16 @@ const categories = Array.isArray(post.data.category) ? post.data.category : [];
 
     .toc-link {
       @apply block pl-4 py-1.5 leading-snug text-neutral-400 transition-colors relative;
+      left: 0.5rem;
+      top: 0.35rem;
+      bottom: 0.35rem;
+      width: 2px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+    }
+
+    .toc-link {
+      @apply block text-neutral-500 transition-colors py-2 pl-4 relative rounded-md;
+      border-left: 2px solid transparent;
     }
 
     .toc-link::before {
@@ -298,16 +333,27 @@ const categories = Array.isArray(post.data.category) ? post.data.category : [];
       border-radius: 9999px;
       background: rgba(255, 255, 255, 0.12);
       transform: translate(-50%, -50%);
+      left: 0.2rem;
+      top: 50%;
+      width: 8px;
+      height: 8px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-50%);
       transition: all 150ms ease;
     }
 
     .toc-link:hover {
       color: #f3f4f6;
+      color: #f7f7f7;
+      border-left-color: rgba(255, 255, 255, 0.08);
     }
 
     .toc-link.is-active {
       color: var(--toc-accent);
       font-weight: 600;
+      border-left-color: var(--toc-accent);
+      background: linear-gradient(90deg, rgba(255, 83, 83, 0.12), transparent);
     }
 
     .toc-link.is-active::before {
@@ -315,6 +361,9 @@ const categories = Array.isArray(post.data.category) ? post.data.category : [];
       box-shadow: 0 0 0 4px rgba(255, 83, 83, 0.18);
       width: 8px;
       height: 8px;
+      box-shadow: 0 0 0 4px rgba(255, 83, 83, 0.15);
+      width: 10px;
+      height: 10px;
     }
   </style>
 </Layout>
