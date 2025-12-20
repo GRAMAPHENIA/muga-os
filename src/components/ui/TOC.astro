@@ -19,6 +19,11 @@ const { headings } = Astro.props;
       as="h3"
       variant="subheading"
       class="mb-4 uppercase tracking-[0.12em] text-[11px] text-neutral-500"
+  <aside class="hidden lg:block w-[240px] sticky top-8 self-start">
+    <Typography
+      as="h3"
+      variant="subheading"
+      class="mb-3 uppercase tracking-[0.12em] text-xs text-neutral-500"
     >
       En esta página
     </Typography>
@@ -35,6 +40,15 @@ const { headings } = Astro.props;
               class={`toc-link group flex gap-3 py-[9px] no-underline text-neutral-400 ${
                 heading.level === 3 ? "text-[13px]" : "text-sm"
               }`}
+      <ol class="relative border-l border-neutral-800">
+        {headings.map((heading) => (
+          <li
+            class={`relative ${
+              heading.level === 3 ? "pl-5" : "pl-4"
+            } leading-6`}
+          >
+            <a
+              class="toc-link group flex gap-3 py-2 text-neutral-400 no-underline"
               href={`#${heading.id}`}
               data-toc-id={heading.id}
               data-toc-level={heading.level}
@@ -44,6 +58,10 @@ const { headings } = Astro.props;
                 aria-hidden="true"
               />
               <span class="flex-1 leading-[1.35]">{heading.text}</span>
+                class="toc-bullet mt-[6px] h-[6px] w-[6px] rounded-full bg-neutral-600"
+                aria-hidden="true"
+              />
+              <span class="flex-1 text-sm">{heading.text}</span>
             </a>
           </li>
         ))}
@@ -108,6 +126,11 @@ const { headings } = Astro.props;
 <style>
   .toc-link {
     @apply relative transition-none hover:text-neutral-100 focus-visible:outline-none focus-visible:text-neutral-100;
+    @apply relative transition-none;
+  }
+
+  .toc-link:hover {
+    @apply text-neutral-200;
   }
 
   .toc-active {
