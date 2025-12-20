@@ -5,6 +5,19 @@ export const prerender = false;
 
 export async function POST({ request }) {
   try {
+    const redirectWithMessage = (searchParams: Record<string, string>) =>
+      new Response(null, {
+        status: 303,
+        headers: {
+          Location: `/ideas?${new URLSearchParams(searchParams).toString()}`
+        }
+      });
+
+    if (process.env.VERCEL === '1' && process.env.VERCEL_ENV === 'production') {
+      console.warn('Crear idea bloqueado en producción: el filesystem es de solo lectura');
+      return redirectWithMessage({ error: 'write-protected' });
+    }
+
     const contentType = request.headers.get('content-type') || '';
     let formData: FormData;
 
@@ -67,18 +80,15 @@ ${description || ''}
     const filePath = join(ideasDir, `${slug}.md`);
     writeFileSync(filePath, frontmatter, 'utf8');
 
-    return new Response(null, {
-      status: 302,
-      headers: {
-        'Location': '/ideas?success=created'
-      }
-    });
+    return redirectWithMessage({ success: 'created' });
 
   } catch (error) {
     console.error('Error creating idea:', error);
-    return new Response(JSON.stringify({ error: 'Error interno del servidor' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
+    return new Response(null, {
+      status: 303,
+      headers: {
+        Location: '/ideas?error=unexpected'
+      }
     });
   }
 }
