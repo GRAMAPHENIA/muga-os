@@ -107,12 +107,13 @@ const categories = Array.isArray(post.data.category) ? post.data.category : [];
         <Typography
           as="h3"
           variant="subheading"
-          class="mb-6 uppercase tracking-wide text-sm"
+          class="mb-4 uppercase tracking-wide text-sm"
         >
           Índice
         </Typography>
-        <nav>
-          <ol class="space-y-3 text-sm">
+
+        <nav class="toc" aria-label="Tabla de contenidos">
+          <ol class="toc-list" role="list">
             <li><a class="toc-link" href="#objetivo">Objetivo del día</a></li>
             <li>
               <a class="toc-link" href="#criterios-muga">Criterios MUGA</a>
@@ -145,25 +146,39 @@ const categories = Array.isArray(post.data.category) ? post.data.category : [];
   <script lang="ts">
     // TOC functionality
     document.addEventListener("DOMContentLoaded", () => {
-      const headings = document.querySelectorAll(".article-content h2[id]");
-      const links = document.querySelectorAll(".toc-link");
+      const headings = Array.from(
+        document.querySelectorAll<HTMLElement>(".article-content h2[id]")
+      );
+      const links = Array.from(
+        document.querySelectorAll<HTMLAnchorElement>(".toc-link")
+      );
 
-      function syncTOC() {
-        let current = undefined;
-
-        headings.forEach((h) => {
-          const htmlH = h;
-          if (window.scrollY >= htmlH.offsetTop - 100) {
-            current = htmlH.id;
-          }
-        });
-
+      const setActive = (id?: string) => {
         links.forEach((link) => {
-          link.classList.toggle(
-            "is-active",
-            link.getAttribute("href") === `#${current}`
-          );
+          const match = link.getAttribute("href") === `#${id}`;
+          link.classList.toggle("is-active", match);
+          link.toggleAttribute("aria-current", match);
         });
+      };
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.target.id) return;
+            if (entry.isIntersecting) {
+              setActive(entry.target.id);
+            }
+          });
+        },
+        {
+          rootMargin: "-45% 0px -45% 0px",
+          threshold: 0.2,
+        }
+      );
+
+      headings.forEach((heading) => observer.observe(heading));
+      if (headings[0]?.id) {
+        setActive(headings[0].id);
       }
 
       // Smooth scroll for TOC links
@@ -171,19 +186,19 @@ const categories = Array.isArray(post.data.category) ? post.data.category : [];
         link.addEventListener("click", (e) => {
           e.preventDefault();
           const targetId = link.getAttribute("href")?.substring(1);
-          const targetElement = document.getElementById(targetId || "");
+          const targetElement = targetId
+            ? document.getElementById(targetId)
+            : null;
 
           if (targetElement) {
             targetElement.scrollIntoView({
               behavior: "smooth",
               block: "start",
             });
+            setActive(targetId);
           }
         });
       });
-
-      window.addEventListener("scroll", syncTOC);
-      syncTOC();
     });
   </script>
 
@@ -247,17 +262,63 @@ const categories = Array.isArray(post.data.category) ? post.data.category : [];
     }
 
     /* Estilos para la TOC */
+    :root {
+      --toc-accent: #FF5353;
+    }
+
+    .toc {
+      @apply bg-neutral-900/70 border border-neutral-800 rounded-lg p-4 shadow-lg;
+    }
+
+    .toc-list {
+      @apply space-y-1 pl-4 relative;
+    }
+
+    .toc-list::before {
+      content: "";
+      position: absolute;
+      left: 0.5rem;
+      top: 0.35rem;
+      bottom: 0.35rem;
+      width: 2px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+    }
+
     .toc-link {
-      @apply block text-neutral-500 transition-colors py-1 border-l-2 border-transparent pl-3;
+      @apply block text-neutral-500 transition-colors py-2 pl-4 relative rounded-md;
+      border-left: 2px solid transparent;
+    }
+
+    .toc-link::before {
+      content: "";
+      position: absolute;
+      left: 0.2rem;
+      top: 50%;
+      width: 8px;
+      height: 8px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-50%);
+      transition: all 150ms ease;
     }
 
     .toc-link:hover {
-      @apply text-white border-neutral-600;
+      color: #f7f7f7;
+      border-left-color: rgba(255, 255, 255, 0.08);
     }
 
-    /* El estado activo tiene los mismos estilos que hover */
     .toc-link.is-active {
-      @apply text-white border-white;
+      color: var(--toc-accent);
+      font-weight: 600;
+      border-left-color: var(--toc-accent);
+      background: linear-gradient(90deg, rgba(255, 83, 83, 0.12), transparent);
+    }
+
+    .toc-link.is-active::before {
+      background: var(--toc-accent);
+      box-shadow: 0 0 0 4px rgba(255, 83, 83, 0.15);
+      width: 10px;
+      height: 10px;
     }
   </style>
 </Layout>
