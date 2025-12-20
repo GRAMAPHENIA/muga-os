@@ -180,16 +180,19 @@ const canonicalURL = Astro.site ? new URL(Astro.url.pathname, Astro.site) : Astr
 
     <script>
       // Manejo del menú con mejores prácticas de accesibilidad y transiciones suaves
-      document.addEventListener('DOMContentLoaded', () => {
-        initializeMenu();
-        initializePrefetch();
-      });
+      let cleanupMenu: (() => void) | null = null;
+      let cleanupPrefetch: (() => void) | null = null;
 
-      // Re-inicializar después de view transitions
-      document.addEventListener('astro:after-swap', () => {
-        initializeMenu();
-        initializePrefetch();
-      });
+      const setupInteractions = () => {
+        cleanupMenu?.();
+        cleanupPrefetch?.();
+
+        cleanupMenu = initializeMenu();
+        cleanupPrefetch = initializePrefetch();
+      };
+
+      document.addEventListener('DOMContentLoaded', setupInteractions);
+      document.addEventListener('astro:after-swap', setupInteractions);
 
       function initializeMenu() {
         const menuToggle = document.getElementById("menu-toggle");
@@ -199,28 +202,28 @@ const canonicalURL = Astro.site ? new URL(Astro.url.pathname, Astro.site) : Astr
         const menuContent = fullMenu?.querySelector('.relative');
         const menuLinks = fullMenu?.querySelectorAll("a");
 
-        if (!menuToggle || !fullMenu || !menuIcon || !closeIcon) return;
+        if (!menuToggle || !fullMenu || !menuIcon || !closeIcon) return () => {};
 
         let isMenuOpen = false;
 
         // Función para abrir el menú
         const openMenu = () => {
           if (isMenuOpen) return;
-          
+
           isMenuOpen = true;
-          
+
           // Prevenir layout shift
           document.body.style.paddingRight = `${window.innerWidth - document.documentElement.clientWidth}px`;
           document.body.style.overflow = 'hidden';
-          
+
           fullMenu.classList.remove("invisible");
           fullMenu.setAttribute("aria-hidden", "false");
           menuToggle.setAttribute("aria-expanded", "true");
-          
+
           // Cambiar iconos
           menuIcon.style.opacity = '0';
           closeIcon.style.opacity = '1';
-          
+
           // Animar entrada del menú
           requestAnimationFrame(() => {
             fullMenu.classList.remove("opacity-0");
@@ -230,7 +233,7 @@ const canonicalURL = Astro.site ? new URL(Astro.url.pathname, Astro.site) : Astr
               menuContent.classList.add("scale-100");
             }
           });
-          
+
           // Enfocar el primer enlace para accesibilidad
           setTimeout(() => {
             const firstLink = menuLinks?.[0] as HTMLElement;
@@ -241,13 +244,13 @@ const canonicalURL = Astro.site ? new URL(Astro.url.pathname, Astro.site) : Astr
         // Función para cerrar el menú
         const closeMenu = () => {
           if (!isMenuOpen) return;
-          
+
           isMenuOpen = false;
-          
+
           // Cambiar iconos
           menuIcon.style.opacity = '1';
           closeIcon.style.opacity = '0';
-          
+
           // Animar salida del menú
           fullMenu.classList.remove("opacity-100");
           fullMenu.classList.add("opacity-0");
@@ -255,54 +258,61 @@ const canonicalURL = Astro.site ? new URL(Astro.url.pathname, Astro.site) : Astr
             menuContent.classList.remove("scale-100");
             menuContent.classList.add("scale-95");
           }
-          
+
           // Después de la animación, ocultar completamente
           setTimeout(() => {
             fullMenu.classList.add("invisible");
             fullMenu.setAttribute("aria-hidden", "true");
             menuToggle.setAttribute("aria-expanded", "false");
-            
+
             // Restaurar scroll del body
             document.body.style.overflow = '';
             document.body.style.paddingRight = '';
-            
+
             // Devolver focus al botón toggle
             menuToggle.focus();
           }, 300);
         };
 
         // Event listeners
-        menuToggle.addEventListener("click", () => {
+        const handleToggle = () => {
           if (isMenuOpen) {
             closeMenu();
           } else {
             openMenu();
           }
-        });
+        };
+        menuToggle.addEventListener("click", handleToggle);
+
+        const linkHandlers: Array<{ el: Element; handler: () => void }> = [];
 
         // Cerrar menú al hacer clic en los enlaces
         menuLinks?.forEach((link) => {
-          link.addEventListener("click", closeMenu);
+          const handler = () => closeMenu();
+          link.addEventListener("click", handler);
+          linkHandlers.push({ el: link, handler });
         });
 
         // Cerrar menú al hacer clic en el overlay
-        fullMenu.addEventListener("click", (e) => {
+        const handleOverlayClick = (e: Event) => {
           if (e.target === fullMenu || e.target === fullMenu.querySelector('.absolute')) {
             closeMenu();
           }
-        });
+        };
+        fullMenu.addEventListener("click", handleOverlayClick);
 
         // Cerrar menú con Escape
-        document.addEventListener("keydown", (e) => {
+        const handleEscape = (e: KeyboardEvent) => {
           if (e.key === "Escape" && isMenuOpen) {
             closeMenu();
           }
-        });
+        };
+        document.addEventListener("keydown", handleEscape);
 
         // Trap focus dentro del menú cuando está abierto
-        fullMenu.addEventListener("keydown", (e) => {
+        const handleTrapFocus = (e: KeyboardEvent) => {
           if (!isMenuOpen) return;
-          
+
           if (e.key === "Tab") {
             const focusableElements = fullMenu.querySelectorAll(
               'button, a, input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -318,16 +328,27 @@ const canonicalURL = Astro.site ? new URL(Astro.url.pathname, Astro.site) : Astr
               firstElement?.focus();
             }
           }
-        });
+        };
+        fullMenu.addEventListener("keydown", handleTrapFocus);
+
+        return () => {
+          closeMenu();
+          menuToggle.removeEventListener("click", handleToggle);
+          fullMenu.removeEventListener("click", handleOverlayClick);
+          document.removeEventListener("keydown", handleEscape);
+          fullMenu.removeEventListener("keydown", handleTrapFocus);
+          linkHandlers.forEach(({ el, handler }) => el.removeEventListener("click", handler));
+        };
       }
 
       function initializePrefetch() {
         const prefetchedUrls = new Set();
-        
+        const handlers: Array<{ el: Element; onEnter: () => void; onLeave: () => void; onFocus: () => void; onBlur: () => void }> = [];
+
         // Función para prefetch de una URL
         const prefetchUrl = (url: string) => {
           if (prefetchedUrls.has(url)) return;
-          
+
           prefetchedUrls.add(url);
           const link = document.createElement('link');
           link.rel = 'prefetch';
@@ -337,35 +358,50 @@ const canonicalURL = Astro.site ? new URL(Astro.url.pathname, Astro.site) : Astr
 
         // Agregar listeners a todos los enlaces internos
         const internalLinks = document.querySelectorAll('a[href^="/"], a[href^="./"], a[href^="../"]');
-        
+
         internalLinks.forEach((link) => {
           const href = link.getAttribute('href');
           if (!href || href === '#' || href.startsWith('#')) return;
-          
+
           let prefetchTimeout: number;
-          
-          link.addEventListener('mouseenter', () => {
+
+          const onEnter = () => {
             // Delay pequeño para evitar prefetch accidental
             prefetchTimeout = window.setTimeout(() => {
               prefetchUrl(href);
             }, 100);
-          });
-          
-          link.addEventListener('mouseleave', () => {
+          };
+          link.addEventListener('mouseenter', onEnter);
+
+          const onLeave = () => {
             clearTimeout(prefetchTimeout);
-          });
-          
+          };
+          link.addEventListener('mouseleave', onLeave);
+
           // También prefetch en focus para navegación por teclado
-          link.addEventListener('focus', () => {
+          const onFocus = () => {
             prefetchTimeout = window.setTimeout(() => {
               prefetchUrl(href);
             }, 200);
-          });
-          
-          link.addEventListener('blur', () => {
+          };
+          link.addEventListener('focus', onFocus);
+
+          const onBlur = () => {
             clearTimeout(prefetchTimeout);
-          });
+          };
+          link.addEventListener('blur', onBlur);
+
+          handlers.push({ el: link, onEnter, onLeave, onFocus, onBlur });
         });
+
+        return () => {
+          handlers.forEach(({ el, onEnter, onLeave, onFocus, onBlur }) => {
+            el.removeEventListener('mouseenter', onEnter);
+            el.removeEventListener('mouseleave', onLeave);
+            el.removeEventListener('focus', onFocus);
+            el.removeEventListener('blur', onBlur);
+          });
+        };
       }
     </script>
   </body>
