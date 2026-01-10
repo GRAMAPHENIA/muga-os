@@ -3,7 +3,7 @@ import { join } from 'path';
 
 export const prerender = false;
 
-export async function POST({ request }) {
+export async function POST({ request }: { request: Request }) {
   try {
     const redirectWithMessage = (searchParams: Record<string, string>) =>
       new Response(null, {

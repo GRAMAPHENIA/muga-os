@@ -3,7 +3,7 @@ import { join } from 'path';
 
 export const prerender = false;
 
-export async function GET({ url }) {
+export async function GET({ url }: { url: URL }) {
   try {
     const slug = url.searchParams.get('slug');
     if (!slug) {

@@ -7,13 +7,15 @@ export interface Props {
   as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span' | 'time';
   variant?: 'title' | 'subtitle' | 'heading' | 'subheading' | 'body' | 'caption' | 'label';
   class?: string;
+  id?: string;
+  datetime?: string;
 }
 
 const {
   as: Element = 'p',
   variant = 'body',
   class: className = ''
-} = Astro.props;
+}: Props = Astro.props;
 
 const variants = {
   title: 'text-4xl md:text-6xl font-bold text-white tracking-tight',
@@ -25,7 +27,7 @@ const variants = {
   label: 'text-xs text-neutral-400 uppercase tracking-wide font-medium'
 };
 
-const classes = `${variants[variant]} ${className}`;
+const classes = `${variants[variant as keyof typeof variants]} ${className}`;
 ---
 
 <Element class={classes}>

@@ -21,7 +21,7 @@ const variants = {
   minimal: 'border-b border-neutral-800 pb-8 last:border-b-0'
 };
 
-const classes = `${variants[variant]} ${className}`;
+const classes = `${variants[variant as keyof typeof variants]} ${className}`;
 ---
 
 <Element class={classes}>

@@ -49,7 +49,7 @@ const transitionName = name ? `view-transition-name: ${name};` : '';
   });
 
   // Transiciones personalizadas para diferentes tipos de navegación
-  document.addEventListener('astro:before-preparation', (event) => {
+  document.addEventListener('astro:before-preparation', (event: any) => {
     const fromUrl = event.detail?.from?.pathname;
     const toUrl = event.detail?.to?.pathname;
 

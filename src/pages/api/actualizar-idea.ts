@@ -4,7 +4,7 @@ import { getIdeaBySlug } from '../../lib/ideas';
 
 export const prerender = false;
 
-export async function POST({ request, url }) {
+export async function POST({ request, url }: { request: Request; url: URL }) {
   try {
     const slug = url.searchParams.get('slug');
     if (!slug) {

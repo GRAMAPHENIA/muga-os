@@ -1,0 +1,94 @@
+---
+export interface TocHeading {
+  id: string;
+  text: string;
+  level: 2 | 3;
+}
+
+interface Props { 
+  headings: TocHeading[]; 
+  maxItems?: number;
+}
+
+const { headings, maxItems = 10 } = Astro.props;
+const tocHeadings = headings.filter(h => h.level === 2).slice(0, maxItems);
+---
+
+<nav aria-label="Progreso del artículo" class="text-xs">
+  <h2 class="text-xl mb-4">En esata página</h2>
+  <!-- Rail vertical continuo -->
+  <div class="relative">
+    <!-- Línea base del rail -->
+    <div class="absolute left-[1.5px] top-0 bottom-0 w-px bg-neutral-800 opacity-50 border border-dashed border-white/20 "></div>
+    
+    <!-- Secciones del rail -->
+    <div class="space-y-3">
+      
+      {tocHeadings.map((heading) => (
+        <div class="relative flex items-center">
+          <!-- Marca de sección en el rail -->
+          <div class="toc-marker absolute left-[1.5px] w-0.5 h-3 bg-neutral-600 transition-colors duration-200"></div>
+          
+          <!-- Texto alineado -->
+          <a 
+            href={`#${heading.id}`}
+            class="toc-link ml-5 block text-neutral-600 hover:text-neutral-400 focus:outline-none transition-colors duration-200 leading-tight"
+          >
+            {heading.text}
+          </a>
+        </div>
+      ))}
+    </div>
+  </div>
+</nav>
+
+<script>
+  const contentContainer = document.querySelector('main') || document.querySelector('.markdown-content') || document.querySelector('.article-content');
+  if (contentContainer) {
+    const targets = contentContainer.querySelectorAll('h2');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // Limpiar estados anteriores
+          document.querySelectorAll('.toc-link').forEach(link => {
+            link.classList.remove('toc-current'); 
+            link.removeAttribute('aria-current');
+          });
+          
+          document.querySelectorAll('.toc-marker').forEach(m => m.classList.remove('toc-marker-active'));
+          
+          // Activar enlace actual
+          const activeLink = document.querySelector(`.toc-link[href="#${entry.target.id}"]`);
+          if (activeLink) {
+            activeLink.classList.add('toc-current');
+            activeLink.setAttribute('aria-current', 'location');
+            
+            // Activar marca correspondiente
+            const marker = activeLink.previousElementSibling;
+            if (marker) marker.classList.add('toc-marker-active');
+          }
+        }
+      });
+    }, { 
+      root: null, 
+      rootMargin: '0px 0px -50% 0px', 
+      threshold: [0] 
+    });
+    
+    targets.forEach((heading) => {
+      heading.classList.add('scroll-mt-20');
+      observer.observe(heading);
+    });
+  }
+</script>
+
+<style>
+  .toc-current { 
+    color: rgba(255, 255, 255, 0.8);
+  }
+  
+  .toc-marker-active { 
+    background-color: rgba(255, 121, 121, 0.9);
+    width: 1px;
+  }
+</style>

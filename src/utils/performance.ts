@@ -64,102 +64,9 @@ export class PerformanceManager {
     document.head.appendChild(link);
   }
 
-  // Lazy loading de componentes
+  // Lazy loading de componentes (temporarily disabled)
   async lazyLoadComponent(componentName: string): Promise<any> {
-    const componentMap: Record<string, () => Promise<any>> = {
-      'BlogCard': () => import('../components/blog/BlogCard.astro'),
-      'BlogPost': () => import('../components/blog/BlogPost.astro'),
-      'LazyImage': () => import('../components/ui/LazyImage.astro'),
-    };
-
-    const loader = componentMap[componentName];
-    if (!loader) {
-      throw new Error(`Component ${componentName} not found`);
-    }
-
-    return this.loadModule(componentName);
-  }
-
-  // Optimización de imágenes
-  optimizeImage(src: string, width?: number, quality = 80): string {
-    // En un entorno real, esto se conectaría con un servicio de optimización de imágenes
-    if (src.includes('images/')) {
-      const params = new URLSearchParams();
-      if (width) params.set('w', width.toString());
-      params.set('q', quality.toString());
-      return `${src}?${params.toString()}`;
-    }
-    return src;
-  }
-
-  // Medición de Web Vitals
-  measureWebVitals(): void {
-    // Largest Contentful Paint
-    if ('PerformanceObserver' in window) {
-      const observer = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        entries.forEach((entry) => {
-          console.log('LCP:', entry.startTime);
-        });
-      });
-      observer.observe({ entryTypes: ['largest-contentful-paint'] });
-    }
-
-    // First Input Delay
-    if ('PerformanceObserver' in window) {
-      const observer = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        entries.forEach((entry) => {
-          console.log('FID:', entry.processingStart - entry.startTime);
-        });
-      });
-      observer.observe({ entryTypes: ['first-input'] });
-    }
-
-    // Cumulative Layout Shift
-    if ('PerformanceObserver' in window) {
-      let clsValue = 0;
-      const observer = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        entries.forEach((entry: any) => {
-          if (!entry.hadRecentInput) {
-            clsValue += entry.value;
-            console.log('CLS:', clsValue);
-          }
-        });
-      });
-      observer.observe({ entryTypes: ['layout-shift'] });
-    }
-  }
-
-  // Intersection Observer para elementos
-  observeElement(
-    element: Element, 
-    callback: (entry: IntersectionObserverEntry) => void,
-    options?: IntersectionObserverInit
-  ): IntersectionObserver {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(callback);
-    }, {
-      rootMargin: '50px 0px',
-      threshold: 0.1,
-      ...options
-    });
-
-    observer.observe(element);
-    return observer;
-  }
-
-  // Debounce para eventos
-  debounce<T extends (...args: any[]) => any>(
-    func: T,
-    wait: number
-  ): (...args: Parameters<T>) => void {
-    let timeout: NodeJS.Timeout;
-    return (...args: Parameters<T>) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(this, args), wait);
-    };
+    throw new Error(`Component loading temporarily disabled for ${componentName}`);
   }
 
   // Throttle para eventos
@@ -175,6 +82,57 @@ export class PerformanceManager {
         setTimeout(() => inThrottle = false, limit);
       }
     };
+  }
+
+  // Debounce para eventos
+  debounce<T extends (...args: any[]) => any>(
+    func: T,
+    delay: number
+  ): (...args: Parameters<T>) => void {
+    let timeoutId: NodeJS.Timeout;
+    return (...args: Parameters<T>) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+  }
+
+  // Medir Web Vitals
+  measureWebVitals(): void {
+    // Largest Contentful Paint
+    if ('PerformanceObserver' in window) {
+      const observer = new PerformanceObserver((list) => {
+        const entries = list.getEntries();
+        const lastEntry = entries[entries.length - 1];
+        console.log('LCP:', lastEntry.startTime);
+      });
+      observer.observe({ entryTypes: ['largest-contentful-paint'] });
+    }
+
+    // First Input Delay
+    if ('PerformanceObserver' in window) {
+      const observer = new PerformanceObserver((list) => {
+        const entries = list.getEntries();
+        entries.forEach((entry) => {
+          console.log('FID:', (entry as any).processingStart - entry.startTime);
+        });
+      });
+      observer.observe({ entryTypes: ['first-input'] });
+    }
+
+    // Cumulative Layout Shift
+    if ('PerformanceObserver' in window) {
+      let clsValue = 0;
+      const observer = new PerformanceObserver((list) => {
+        const entries = list.getEntries();
+        entries.forEach((entry: any) => {
+          if (!entry.hadRecentInput) {
+            clsValue += entry.value;
+          }
+        });
+        console.log('CLS:', clsValue);
+      });
+      observer.observe({ entryTypes: ['layout-shift'] });
+    }
   }
 }
 
@@ -202,16 +160,20 @@ export function initializePerformanceOptimizations(): void {
         }, 100);
         
         link.addEventListener('mouseenter', debouncedPrefetch);
-        link.addEventListener('focus', debouncedPrefetch);
+        link.addEventListener('touchstart', debouncedPrefetch);
       });
     };
 
     addPrefetchListeners();
     
-    // Re-ejecutar después de view transitions
-    document.addEventListener('astro:after-swap', addPrefetchListeners);
+    // Observer para enlaces dinámicos
+    const mutationObserver = new MutationObserver(() => {
+      addPrefetchListeners();
+    });
+    
+    mutationObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
   });
 }
-
-// Exportar instancia singleton
-export const performanceManager = PerformanceManager.getInstance();
