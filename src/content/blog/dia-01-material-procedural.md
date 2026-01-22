@@ -215,35 +215,12 @@ image: '/images/sfsdf-featured.png'
     <li><strong class="text-white">Micrograno solo en roughness:</strong> para que el color no se ensucie.</li>
     <li><strong class="text-white">Distortion leve:</strong> para romper "uniformidad digital" sin deformar el material.</li>
   </ul>
-
-  <aside aria-label="Siguiente paso sugerido" class="bg-neutral-800 p-6 my-8 border-l-4 border-neutral-600">
-    <h3 class="text-lg font-semibold text-neutral-200 mb-4">Siguiente paso sugerido</h3>
-    <p class="text-neutral-300">
-      En el Día 02 podemos formalizar el material como "asset de biblioteca" con parámetros claros:
-      <strong class="text-white">escala macro</strong>, <strong class="text-white">escala micro</strong>, <strong class="text-white">contraste</strong>, <strong class="text-white">roughness base</strong>, <strong class="text-white">bump</strong>.
-    </p>
-  </aside>
-</section>
-
-<section id="export" class="mb-12">
-  <h2 class="text-2xl font-bold text-white mt-16 mb-8 uppercase tracking-wide">Checklist para publicar como asset (MUGA.studio)</h2>
-  <ul class="list-disc list-inside space-y-4 text-neutral-300 mb-6">
-    <li><strong class="text-white">Nombres claros:</strong> nodos y grupos con prefijos (por ejemplo, <code class="bg-neutral-700 px-2 py-1 text-neutral-200">MUGA_</code>).</li>
-    <li><strong class="text-white">Parámetros expuestos:</strong> que el usuario controle lo importante sin entrar al caos.</li>
-    <li><strong class="text-white">Escena demo:</strong> una esfera + un plano + luz simple para ver el material.</li>
-    <li><strong class="text-white">Capturas:</strong> close-up + plano medio + vista en contexto.</li>
-    <li><strong class="text-white">Notas:</strong> qué controla cada parámetro y qué no conviene tocar.</li>
-  </ul>
-</section>
-
+  
 <footer class="mt-16 pt-8 border-t border-neutral-700">
   <section aria-label="Créditos y licencia" class="mb-8">
     <h2 class="text-xl font-bold text-white mb-4 uppercase tracking-wide">Créditos y licencia</h2>
-    <p class="text-neutral-300 mb-4">
-      Material y tutorial: MUGA.studio. Publicación orientada a assets gratuitos.
-    </p>
     <p class="text-neutral-300">
-      Licencia sugerida: indicar claramente en la publicación del asset (por ejemplo, uso libre con atribución o similar).
+      Uso libre.
     </p>
   </section>
 
