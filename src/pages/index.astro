@@ -72,7 +72,7 @@ const secondaryPosts = recentPosts.slice(1, 3);
         
         <div class="space-y-8" role="list" aria-label="Lista de publicaciones recientes">
           {secondaryPosts.map((post) => (
-            <div role="listitem" key={post.slug}>
+            <div role="listitem" data-key={post.slug}>
               <BlogCard
                 title={post.data.title}
                 slug={post.slug}
